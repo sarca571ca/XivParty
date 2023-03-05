@@ -99,6 +99,10 @@ function player:merge(other)
 	return self
 end
 
+function GetIsMobByIndex(index)
+	return (bit.band(AshitaCore:GetMemoryManager():GetEntity():GetSpawnFlags(index), 0x10) ~= 0);
+end
+
 function player:update(member, target, subtarget)
 	self.name = member.name
 
@@ -109,22 +113,24 @@ function player:update(member, target, subtarget)
 	self.mpp = member.mpp
 	self.tpp = math.min(member.tp / 10, 100)
 
-	self.isSelected = target and member.mob and target.id == member.mob.id
-	self.isSubTarget = subtarget and member.mob and subtarget.id == member.mob.id
+	self.isSelected = member.targeted;
+	self.isSubTarget = member.subTargeted;
 
 	self.zone = member.zone
-	self.isOutsideZone = self.zone and self.zone ~= windower.ffxi.get_info().zone
+	self.isOutsideZone = not member.inzone
 
 	self.distance = nil
 
-	if member.mob then
-		self.id = member.mob.id
-		self.isTrust = member.mob.is_npc
+	if self.isOutsideZone == false then
+		self.id = member.targetIdx
+		self.isTrust = GetIsMobByIndex(self.id );
 
-		if member.mob.distance then
-			self.distance = member.mob.distance:sqrt()
+		-- Get our distance
+		local thisEnt = GetEntity(self.id);
+		if (thisEnt) then
+			self.distance = math.sqrt(thisEnt.Distance)
 		end
-
+		--[[ TODO
 		if self.isTrust and (self.job == nil or self.jobLvl == nil or self.jobLvl == 0) then -- optimization: only update if job/lvl not set
 			local trustInfo = jobs:getTrustInfo(self.name, member.mob.models[1])
 			if trustInfo then
@@ -140,24 +146,19 @@ function player:update(member, target, subtarget)
 				end
 			end
 		end
+		]]--
 	end
 
 	self.isInCastingRange = self.distance and self.distance < const.castRange
 	self.isInTargetingRange = self.distance and self.distance < const.targetRange
 
-	local mainPlayer = windower.ffxi.get_player()
-	self.isMainPlayer = self.name == mainPlayer.name
+	self.isMainPlayer = member.memIdx == 0;
 
-	if self.isMainPlayer then -- set buffs and job info for main player
-		self:updateBuffs(mainPlayer.buffs)
-		self.job = res.jobs[mainPlayer.main_job_id].ens
-		self.jobLvl = mainPlayer.main_job_level
-
-		if mainPlayer.sub_job_id then -- only if subjob is set
-			self.subJob = res.jobs[mainPlayer.sub_job_id].ens
-			self.subJobLvl = mainPlayer.sub_job_level
-		end
-	end
+	self.job = member.job;
+	self.subJob = member.subJob;
+	self.jobLvl = member.level;
+	self.subJobLvl = member.subLevel;
+	self:updateBuffs(member.buffs);
 end
 
 local function buffOrderCompare(a, b)
@@ -175,10 +176,11 @@ end
 
 function player:updateBuffs(buffs)
 	self.buffs = buffs -- list of all buffs this player has
-	self.filteredBuffs = T{} -- list of filtered buffs to be displayed
+	self.filteredBuffs = buffs -- list of filtered buffs to be displayed
 
 	if not buffs then return end
 
+	--[[ TODO
 	for i = 1, const.maxBuffs do
 		local buff = buffs[i]
 
@@ -192,11 +194,13 @@ function player:updateBuffs(buffs)
 		end
 	end
 
+
 	if Settings.buffs.customOrder then
 		self.filteredBuffs:sort(buffOrderCompare)
 	else
 		self.filteredBuffs:sort()
 	end
+	]]--
 end
 
 function player:refreshFilteredBuffs()

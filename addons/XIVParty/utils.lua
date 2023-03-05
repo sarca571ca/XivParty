@@ -39,6 +39,7 @@ local utils = {}
 utils.level = 3
 
 function utils:colorFromHex(hexString)
+	if (hexString == nil) then return; end
 	local length = string.length(hexString)
 	if length == 0 then return nil end
 

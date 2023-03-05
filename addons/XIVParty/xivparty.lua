@@ -39,7 +39,7 @@ local socket = require('socket')
 local const = require('const')
 local utils = require('utils')
 local uiView = require('uiView')
---local model = require('model').new()
+local model = require('model').new()
 settingsLib = require('settings')
 --local uiSettings = require('uiSettings');
 
@@ -202,7 +202,7 @@ ashita.events.register('d3d_present', 'present_cb', function ()
 	lastFrameTimeMsec = timeMsec
 
 --	Settings:update()
---	model:updatePlayers()
+	model:updatePlayers()
 
 	view:visible(isSetupEnabled or not Settings.hideSolo or not isSolo(), const.visSolo)
 	view:update()

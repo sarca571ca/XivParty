@@ -94,11 +94,11 @@ function uiBuffIcons:validateLayout(layout)
 		singleEntry = true
 	end
 	if singleEntry then
-		warning('To prevent the addon load warning when using a single buff icon row, add an empty row at the end. Example: 32,0')
+		print('To prevent the addon load warning when using a single buff icon row, add an empty row at the end. Example: 32,0')
 	end
 
 	-- check that number of rows in both lists is equal
-	if layout.numIconsByRow:length() ~= layout.offsetByRow:length() then
+	if #layout.numIconsByRow ~= #layout.offsetByRow then
 		error('Layout invalid! Lists numIconsByRow and offsetByRow must have the same number of entries!')
 		return false
 	end
@@ -108,7 +108,7 @@ end
 
 -- gets the row index for the specified icon index, returns nil if the icon won't fit in the defined rows
 function uiBuffIcons:getRow(iconIndex)
-	for row = 1, self.layout.numIconsByRow:length() do
+	for row = 1, #self.layout.numIconsByRow do
 		local numIcons = tonumber(self.layout.numIconsByRow[row]) -- numbers in T{} lists are loaded as strings by the config library
 
 		if iconIndex <= numIcons then return row end
@@ -141,7 +141,7 @@ end
  -- maximum number of icons we can display, either capped by row definitions or the game's limit of 32
 function uiBuffIcons:getMaxBuffCount()
 	local count = 0
-	for row = 1, self.layout.numIconsByRow:length() do
+	for row = 1, #self.layout.numIconsByRow do
 		local numIcons = tonumber(self.layout.numIconsByRow[row])
 		count = count + numIcons
 	end
@@ -172,7 +172,7 @@ function uiBuffIcons:update()
 				local numIcons = self.layout.numIconsByRow[row] -- maximum number of icons that fit in this row
 				local sumPreviousRows = self:getSumOfPreviousRows(row)
 
-				local totalBuffCount = math.min(buffs:length(), self.maxBuffCount) -- total number of active buffs to display
+				local totalBuffCount = math.min(#buffs, self.maxBuffCount) -- total number of active buffs to display
 				local buffCountInRow = math.min(totalBuffCount - sumPreviousRows, numIcons) -- number of active buffs to display in current row
 
 				local indexOffset = buffCountInRow - numIcons -- offset between image index and buff index

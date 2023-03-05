@@ -89,7 +89,7 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		end
 
 		if saveSettings then
-
+			-- TODO?
 		end
 
         self.posX = pos.x
@@ -174,10 +174,10 @@ function uiPartyList:update()
 		end
 	end
 
-	local partySettings = Settings:getPartySettings(self.partyIndex)
+	local partySettings = getPartySettings(self.partyIndex)
 
 	-- update the background
-	local count = self.listItems:length()
+	local count = #self.listItems
 	local rowCount = math.floor((count - 1) / self.layout.columns) + 1
 	if partySettings.showEmptyRows then
 		rowCount = self.layout.rows

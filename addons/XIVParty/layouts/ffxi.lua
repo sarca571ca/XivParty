@@ -246,7 +246,6 @@ local settings = {
                     imgIcon = {
                         color = '#FFFFFFFF',
                         enabled = true,
-                        path },
                         pos = {0,0},
                         size = {36,36},
                     },
@@ -388,6 +387,7 @@ local settings = {
                     zOrder = 9,
                 },
             },
-        }
+        },
+}
 
 return settings;

@@ -25,7 +25,6 @@ partyList.GetMemberInformation = function(memIdx)
     local party = AshitaCore:GetMemoryManager():GetParty();
     local player = AshitaCore:GetMemoryManager():GetPlayer();
 
-	local playerTarget = AshitaCore:GetMemoryManager():GetTarget();
     if (player == nil or party == nil or party:GetMemberIsActive(memIdx) == 0) then
         return nil;
     end
@@ -47,14 +46,10 @@ partyList.GetMemberInformation = function(memIdx)
         memberInfo.job = party:GetMemberMainJob(memIdx);
         memberInfo.level = party:GetMemberMainJobLevel(memIdx);
         memberInfo.serverid = party:GetMemberServerId(memIdx);
-        if (playerTarget ~= nil) then
-            local t1, t2 = gStatusLib.helpers.GetTargets();
-            local thisIdx = party:GetMemberTargetIndex(memIdx);
-            memberInfo.targeted = (t1 == thisIdx);
-            memberInfo.subTargeted = (t2 == thisIdx);
-        else
-            memberInfo.targeted = false;
-            memberInfo.subTargeted = false;
+        local t1, t2 = gStatusLib.helpers.GetTargets();
+        local thisIdx = party:GetMemberTargetIndex(memIdx);
+        memberInfo.targeted = (t1 and t1 == thisIdx);
+        memberInfo.subTargeted = (t2 and t2 == thisIdx);
         end
         if (memIdx == 0) then
             memberInfo.buffs = player:GetBuffs();

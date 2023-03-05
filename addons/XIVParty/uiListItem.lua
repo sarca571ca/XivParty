@@ -31,7 +31,7 @@
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiJobIcon = require('uiJobIcon')
---local uiStatusBar = require('uiStatusBar')
+local uiStatusBar = require('uiStatusBar')
 local uiLeader= require('uiLeader')
 local uiRange = require('uiRange')
 local uiBuffIcons = require('uiBuffIcons')
@@ -62,6 +62,7 @@ function uiListItem:init(layout, player, isUiLocked, itemWidth, itemHeight)
 
 		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon, player))
 
+		print(tostring(layout.leader == nil));
 		self.txtName = self:addChild(uiText.new(layout.txtName))
 		self.txtZone = self:addChild(uiText.new(layout.txtZone))
 
@@ -77,9 +78,11 @@ function uiListItem:init(layout, player, isUiLocked, itemWidth, itemHeight)
 		self.imgMouse:size(math.max(0, itemWidth - 1), math.max(0, itemHeight - 1)) -- reduce size by 1 to prevent hovering over two neighboring items at the same time
 		self.imgMouse:alpha(isDebug and 32 or 0)
 
+		--[[
 		self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
 			return self:handleWindowerMouse(type, x, y, delta, blocked)
 		end)
+		]]--
 	end
 end
 

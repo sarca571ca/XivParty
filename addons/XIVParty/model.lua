@@ -62,14 +62,74 @@ function model:clear()
 	end
 end
 
+function model:GetMemberInformation(memIdx)
+
+    local party = AshitaCore:GetMemoryManager():GetParty();
+    local player = AshitaCore:GetMemoryManager():GetPlayer();
+
+    if (player == nil or party == nil or party:GetMemberIsActive(memIdx) == 0) then
+        return nil;
+    end
+
+    local memberInfo = {};
+	memberInfo.memIdx = memIdx;
+    memberInfo.zone = party:GetMemberZone(memIdx);
+    memberInfo.inzone = memberInfo.zone == party:GetMemberZone(0);
+    memberInfo.name = party:GetMemberName(memIdx);
+    memberInfo.leader = party:GetAlliancePartyLeaderServerId1() == party:GetMemberServerId(memIdx);
+
+    if (memberInfo.inzone == true) then
+        memberInfo.hp = party:GetMemberHP(memIdx);
+        memberInfo.hpp = party:GetMemberHPPercent(memIdx) / 100;
+        memberInfo.maxhp = memberInfo.hp / memberInfo.hpp;
+        memberInfo.mp = party:GetMemberMP(memIdx);
+        memberInfo.mpp = party:GetMemberMPPercent(memIdx) / 100;
+        memberInfo.maxmp = memberInfo.mp / memberInfo.mpp;
+        memberInfo.tp = party:GetMemberTP(memIdx);
+        memberInfo.job = party:GetMemberMainJob(memIdx);
+		memberInfo.subJob = party:GetMemberSubJob(memIdx);
+        memberInfo.level = party:GetMemberMainJobLevel(memIdx);
+		memberInfo.subLevel = party:GetMemberSubJobLevel(memIdx);
+        memberInfo.serverid = party:GetMemberServerId(memIdx);
+        local t1, t2 = gStatusLib.helpers.GetTargets();
+        memberInfo.targetIdx = party:GetMemberTargetIndex(memIdx);
+        memberInfo.targeted = (t1 and t1 == memberInfo.targetIdx);
+        memberInfo.subTargeted = (t2 and t2 == memberInfo.targetIdx);
+        if (memIdx == 0) then
+            memberInfo.buffs = player:GetBuffs();
+        else
+            memberInfo.buffs = gStatusLib.GetStatusIdsById(memberInfo.serverid);
+        end
+        memberInfo.sync = bit.band(party:GetMemberFlagMask(memIdx), 0x100) == 0x100;
+    else
+        memberInfo.hp = 0;
+        memberInfo.hpp = 0;
+        memberInfo.maxhp = 0;
+        memberInfo.mp = 0;
+        memberInfo.mpp = 0;
+        memberInfo.maxmp = 0;
+        memberInfo.tp = 0;
+        memberInfo.job = '';
+		memberInfo.subJob = '';
+		memberInfo.subLevel = '';
+        memberInfo.level = '';
+		memberInfo.targetIdx = 0;
+        memberInfo.targeted = false;
+        memberInfo.serverid = 0;
+        memberInfo.buffs = nil;
+        memberInfo.sync = false;
+        memberInfo.subTargeted = false;
+    end
+
+    return memberInfo;
+end
+
 function model:updatePlayers()
-	local members = T(windower.ffxi.get_party())
-	local target = windower.ffxi.get_mob_by_target('t')
-	local subtarget = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('stpt') or windower.ffxi.get_mob_by_target('stal')
+	local target, subtarget = gStatusLib.helpers.GetTargets();
 
 	for i = 0, 17 do
 		local idx = (i / 6):floor()
-		local member = members[string.format(partyKeys[idx + 1], i % 6)]
+		local member = model:GetMemberInformation(i);
 
 		if member and member.name then
 			local id
@@ -77,10 +137,9 @@ function model:updatePlayers()
 				id = member.mob.id
 			end
 
-			local foundPlayer = self:getPlayer(member.name, id, 'member')
-			if foundPlayer then
-				foundPlayer:update(member, target, subtarget)
-			end
+			-- always just create a new player for now TODO
+			local foundPlayer = player.new(member.name, id, self)
+			foundPlayer:update(member, target, subtarget)
 
 			self.parties[idx][i % 6] = foundPlayer
 		else
@@ -89,6 +148,7 @@ function model:updatePlayers()
 	end
 end
 
+--[[
 -- gets or creates a player based on name or ID
 -- will merge existing players if a name-ID match is found
 function model:getPlayer(name, id, debugTag, dontCreate)
@@ -149,7 +209,7 @@ end
 function model:findPlayer(name)
 	return self:getPlayer(name, nil, 'findPlayer', true)
 end
-
+]]--
 -- finds leader of a party, defaults to main party when no index is specified
 function model:findPartyLeader(partyIndex)
 	if not partyIndex then partyIndex = 0 end
@@ -170,7 +230,7 @@ function model:refreshFilteredBuffs()
 end
 
 function model:hasAlliance2Members()
-	return self.parties[2]:length() > 0
+	return #self.parties[2] > 0
 end
 
 -- creates dummy parties for setup mode
@@ -225,7 +285,7 @@ function model:debugAddSetupPlayer(partyIndex)
 	if not partyIndex then partyIndex = 0 end
 
 	local setupParty = self.parties[partyIndex]
-	local i = setupParty:length()
+	local i = #setupParty
 
 	if i > 5 then error('Cannot add setup player, party full!') return end
 

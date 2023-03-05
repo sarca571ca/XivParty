@@ -97,13 +97,16 @@ function uiText:dispose()
 end
 
 local function setTrimmedText(wrappedText, text, maxChars)
+    --[[ TODO
     if text and maxChars > 0 then
         if #text > maxChars then
             text = text:slice(1, math.max(1, maxChars - 1)) .. '...'
         end
     end
-
-    wrappedText:SetText(text)
+    ]]--
+    if (text ~= nil) then
+        wrappedText:SetText(text)
+    end
 end
 
 -- NOTE: z-ordering for texts works, but only relative to other texts. windower seems to always place texts above images!
@@ -119,7 +122,6 @@ function uiText:createPrimitives()
         },
         right_justified = private[self].alignRight,
     }
-    self.wrappedText.
     self.wrappedText = texts:new(textSettings)
     RefCountText = RefCountText + 1
     if (private[self].font ~= nil) then
@@ -146,7 +148,7 @@ function uiText:applyLayout()
 
     self.wrappedText.position_x = x;
     self.wrappedText.position_y = y
-    self.wrappedText:SetFontHeight(private[self].fontSize * self.absoluteScale.y)
+    self.wrappedText:SetFontHeight(math.floor(private[self].fontSize * self.absoluteScale.y))
     --self.wrappedText:stroke_width(private[self].strokeWidth * self.absoluteScale.x)
     self.wrappedText.visible = self.absoluteVisibility
 end
