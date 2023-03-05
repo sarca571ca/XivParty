@@ -80,10 +80,10 @@ function model:GetMemberInformation(memIdx)
 
     if (memberInfo.inzone == true) then
         memberInfo.hp = party:GetMemberHP(memIdx);
-        memberInfo.hpp = party:GetMemberHPPercent(memIdx) / 100;
+        memberInfo.hpp = party:GetMemberHPPercent(memIdx);
         memberInfo.maxhp = memberInfo.hp / memberInfo.hpp;
         memberInfo.mp = party:GetMemberMP(memIdx);
-        memberInfo.mpp = party:GetMemberMPPercent(memIdx) / 100;
+        memberInfo.mpp = party:GetMemberMPPercent(memIdx);
         memberInfo.maxmp = memberInfo.mp / memberInfo.mpp;
         memberInfo.tp = party:GetMemberTP(memIdx);
 	    memberInfo.job = AshitaCore:GetResourceManager():GetString("jobs.names_abbr", party:GetMemberMainJob(memIdx));

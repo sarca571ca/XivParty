@@ -181,8 +181,10 @@ function uiImage:applyLayout()
 		self.wrappedImage.position_x = self.absolutePos.x;
 		self.wrappedImage.position_y = self.absolutePos.y;
 		-- DO THIS NEXT (FIX THE SCALING)
-		self.wrappedImage.width = self.absoluteWidth;
-		self.wrappedImage.height = self.absoluteHeight;
+--		self.wrappedImage.width = self.absoluteWidth;
+		self.wrappedImage.scale_x = self.absoluteWidth / self.wrappedImage.width;
+		self.wrappedImage.scale_y = self.absoluteHeight / self.wrappedImage.height;
+--		self.wrappedImage.height = self.absoluteHeight;
 		self.wrappedImage.visible = self.absoluteVisibility;
 	end
 end
