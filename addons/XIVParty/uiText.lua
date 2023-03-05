@@ -27,7 +27,7 @@
 ]]
 
 -- windower library imports
-local texts = require('texts')
+local texts = require('fonts')
 require('strings')
 
 -- imports
@@ -89,7 +89,7 @@ function uiText:dispose()
     if not self.isEnabled then return end
 
     if self.isCreated then
-        texts.destroy(self.wrappedText)
+        self.wrappedText:destroy();
         RefCountText = RefCountText - 1
     end
     private[self] = nil
@@ -104,7 +104,7 @@ local function setTrimmedText(wrappedText, text, maxChars)
         end
     end
 
-    wrappedText:text(text)
+    wrappedText:SetText(text)
 end
 
 -- NOTE: z-ordering for texts works, but only relative to other texts. windower seems to always place texts above images!
@@ -112,23 +112,25 @@ function uiText:createPrimitives()
     if not self.isEnabled or self.isCreated then return end
 
     local textSettings = {
-        flags = {
-            draggable = false,
-            right = private[self].alignRight
-        }
+        locked = true,
+        draw_flags = 0x10,
+        background = 
+        T{
+            visible = false,
+        },
+        right_justified = private[self].alignRight,
     }
-
-    self.wrappedText = texts.new(textSettings)
+    self.wrappedText.
+    self.wrappedText = texts:new(textSettings)
     RefCountText = RefCountText + 1
-    self.wrappedText:bg_visible(false)
-    self.wrappedText:font(private[self].font, 'Arial') -- Arial is the fallback font
+    if (private[self].font ~= nil) then
+        self.wrappedText.font = private[self].font
+    else
+        self.wrappedText.font = 'Arial' -- Arial is the fallback font
+    end
     setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
-
-    self.wrappedText:color(private[self].color.r, private[self].color.g, private[self].color.b)
-    self.wrappedText:alpha(private[self].color.a)
-    self.wrappedText:stroke_color(private[self].stroke.r, private[self].stroke.g, private[self].stroke.b)
-    self.wrappedText:stroke_alpha(private[self].stroke.a)
-
+    self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, private[self].color.r, private[self].color.g, private[self].color.b), 16);
+    self.wrappedText.color_outline = tonumber(string.format('%02x%02x%02x%02x', private[self].stroke.a, private[self].stroke.r, private[self].stroke.g, private[self].stroke.b), 16);
     self.super:createPrimitives() -- this will call applyLayout()
 end
 
@@ -140,13 +142,14 @@ function uiText:applyLayout()
 
     if private[self].alignRight then
         -- right aligned text coordinates start at the right side of the screen
-        x = x - windower.get_windower_settings().ui_x_res
+        x = x - AshitaCore:GetConfigurationManager():GetFloat('boot', 'ffxi.registry', '0001', 1024);
     end
 
-    self.wrappedText:pos(x, y)
-    self.wrappedText:size(private[self].fontSize * self.absoluteScale.y)
-    self.wrappedText:stroke_width(private[self].strokeWidth * self.absoluteScale.x)
-    self.wrappedText:visible(self.absoluteVisibility)
+    self.wrappedText.position_x = x;
+    self.wrappedText.position_y = y
+    self.wrappedText:SetFontHeight(private[self].fontSize * self.absoluteScale.y)
+    --self.wrappedText:stroke_width(private[self].strokeWidth * self.absoluteScale.x)
+    self.wrappedText.visible = self.absoluteVisibility
 end
 
 function uiText:update(text)
@@ -181,7 +184,7 @@ function uiText:color(r,g,b)
         private[self].color.b = b
 
         if self.isCreated then
-            self.wrappedText:color(r,g,b)
+            self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, r, g, b), 16);
         end
     end
 
@@ -198,7 +201,7 @@ function uiText:alpha(a)
 	    private[self].color.a = a
 
         if self.isCreated then
-	        self.wrappedText:alpha(a)
+            self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', a, private[self].color.r, private[self].color.g, private[self].color.b), 16);
         end
     end
 end

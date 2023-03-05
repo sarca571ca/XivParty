@@ -26,12 +26,13 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon.name = 'XivParty'
-_addon.author = 'Tylas'
-_addon.version = '2.1.1'
-_addon.commands = {'xp', 'xivparty'}
+addon.name = 'XIVParty'
+addon.author = 'Tirem, Tylas (Original Creator)'
+addon.version = '2.1.1'
 
 -- windower library imports
+gStatusLib = require('status.status');
+require('common')
 local packets = require('packets')
 local socket = require('socket')
 local res = require('resources')
@@ -112,9 +113,14 @@ local function isSolo()
 	return windower.ffxi.get_party().party1_leader == nil
 end
 
--- per frame updating
 
-windower.register_event('prerender', function()
+local function UpdatePartyInfo()
+	
+end
+
+
+-- per frame updating
+ashita.events.register('d3d_present', 'present_cb', function ()
 	if isZoning or not isInitialized then return end
 
 	local timeMsec = socket.gettime() * 1000
@@ -129,7 +135,6 @@ windower.register_event('prerender', function()
 end)
 
 -- packets
-
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
 	if id == 0xC8 then -- alliance update
 		local packet = packets.parse('incoming', original)
