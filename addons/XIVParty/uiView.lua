@@ -89,10 +89,12 @@ local function loadLayout(layoutName)
 	local layoutFile, layoutAllianceFile = getLayoutFileNames(layoutName)
 
 	local layout = LoadFile_s(addon.path .. layoutFile);
+	table.merge(layout, layoutDefaults, false);
 	local layoutAlliance
 
 	if ashita.fs.exists(addon.path .. layoutAllianceFile) then
 		layoutAlliance = LoadFile_s(addon.path .. layoutAllianceFile);
+		table.merge(layoutAlliance, layoutDefaults, false);
 	else
 		layoutAlliance = layout
 	end

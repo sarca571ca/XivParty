@@ -73,7 +73,6 @@ end
 -- sets the height of the content area (excludes top and bottom tiles)
 function uiBackground:update()
 	if not self.isEnabled then return end
-
 	local contentHeight = self.contentHeight / self.scaleY -- negate vertical scaling, we want to set the height directly
 
 	self.imgMid:size(self.sizeMid.x, contentHeight)

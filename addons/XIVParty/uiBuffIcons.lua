@@ -172,7 +172,7 @@ function uiBuffIcons:update()
 				local numIcons = self.layout.numIconsByRow[row] -- maximum number of icons that fit in this row
 				local sumPreviousRows = self:getSumOfPreviousRows(row)
 
-				local totalBuffCount = math.min(#buffs, self.maxBuffCount) -- total number of active buffs to display
+				local totalBuffCount = math.min(buffs:length(), self.maxBuffCount) -- total number of active buffs to display
 				local buffCountInRow = math.min(totalBuffCount - sumPreviousRows, numIcons) -- number of active buffs to display in current row
 
 				local indexOffset = buffCountInRow - numIcons -- offset between image index and buff index

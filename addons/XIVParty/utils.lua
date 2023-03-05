@@ -117,7 +117,7 @@ end
 -- stable in-place sorting
 -- @param func a comparison function that returns true when a > b
 function utils:insertionSort(array, func)
-    local len = #array
+    local len = array:length()
     for j = 2, len do
         local key = array[j]
         local i = j - 1

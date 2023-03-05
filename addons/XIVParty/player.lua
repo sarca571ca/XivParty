@@ -241,7 +241,8 @@ function player:createSetupData(job, subJob, isMainParty)
 	self.mpp = math.random(50, 100)
 	self.tpp = math.min(self.tp / 1000 * 100, 100)
 
-	self.zone = windower.ffxi.get_info().zone
+	local party = AshitaCore:GetMemoryManager():GetParty();
+	self.zone = party:GetMemberZone(0);
 
 	self.isSelected = false
 	self.isSubTarget = false

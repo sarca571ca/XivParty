@@ -190,7 +190,7 @@ local settings = {
                     imgIcon = {
                         color = '#FFFFFFFF',
                         enabled = true,
-                        path },
+                        path = ''},
                         pos = {0,0},
                         size = {36,36},
                     },

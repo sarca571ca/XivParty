@@ -143,9 +143,9 @@ function uiListItem:updateZone()
 
 	if self.player.zone and self.player.isOutsideZone then
 		if self.layout.txtZone.short then
-			zoneString = '('..res.zones[self.player.zone]['search']..')'
+			zoneString = '('..AshitaCore:GetResourceManager():GetString("zones.names", self.player.zone)..')'
 		else
-			zoneString = '('..res.zones[self.player.zone].name..')'
+			zoneString = '('..AshitaCore:GetResourceManager():GetString("zones.names", self.player.zone)..')'
 		end
 	end
 

@@ -41,7 +41,6 @@ local utils = require('utils')
 local uiView = require('uiView')
 local model = require('model').new()
 settingsLib = require('settings')
---local uiSettings = require('uiSettings');
 
 -- local and global variables
 local isInitialized = false
@@ -61,6 +60,18 @@ RefCountImage = 0
 RefCountText = 0
 
 -- initialization / events
+local function setSetupEnabled(enabled)
+	if (not isInitialized) then return end;
+	isSetupEnabled = enabled
+
+	if not setupModel then
+		setupModel = model.new()
+		setupModel:createSetupData()
+	end
+
+	view:setModel(isSetupEnabled and setupModel or model) -- lua style ternary operator
+	view:setUiLocked(not isSetupEnabled)
+end
 
 local function init()
 	if not isInitialized then
@@ -186,11 +197,6 @@ local function CheckState()
 	end
 end
 
-local function UpdatePartyInfo()
-	
-end
-
-
 -- per frame updating
 ashita.events.register('d3d_present', 'present_cb', function ()
 	CheckState();
@@ -207,6 +213,17 @@ ashita.events.register('d3d_present', 'present_cb', function ()
 	view:visible(isSetupEnabled or not Settings.hideSolo or not isSolo(), const.visSolo)
 	view:update()
 end)
+
+ashita.events.register('command', 'command_cb', function (e)
+	-- Parse the command arguments
+	local command_args = e.command:lower():args()
+    if table.contains({'/xivparty'}, command_args[1]) then
+		-- Toggle the config menu
+		setSetupEnabled(not isSetupEnabled);
+		e.blocked = true;
+	end
+
+end);
 
 -- packets
 --[[
@@ -418,18 +435,6 @@ local function getRange(arg)
 	end
 
 	return range
-end
-
-local function setSetupEnabled(enabled)
-	isSetupEnabled = enabled
-
-	if not setupModel then
-		setupModel = model.new()
-		setupModel:createSetupData()
-	end
-
-	view:setModel(isSetupEnabled and setupModel or model) -- lua style ternary operator
-	view:setUiLocked(not isSetupEnabled)
 end
 
 --[[ TODO: Turn into config window

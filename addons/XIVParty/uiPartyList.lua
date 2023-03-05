@@ -177,7 +177,7 @@ function uiPartyList:update()
 	local partySettings = getPartySettings(self.partyIndex)
 
 	-- update the background
-	local count = #self.listItems
+	local count = self.listItems:length()
 	local rowCount = math.floor((count - 1) / self.layout.columns) + 1
 	if partySettings.showEmptyRows then
 		rowCount = self.layout.rows

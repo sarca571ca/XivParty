@@ -230,15 +230,15 @@ function model:refreshFilteredBuffs()
 end
 
 function model:hasAlliance2Members()
-	return #self.parties[2] > 0
+	return self.parties[2]:length() > 0
 end
 
 -- creates dummy parties for setup mode
 function model:createSetupData()
 	for partyIndex = 0, 2 do
 		for i = 0, 5 do
-			local j = res.jobs[math.random(1,22)].ens
-			local sj = res.jobs[math.random(1,22)].ens
+			local j = AshitaCore:GetResourceManager():GetString("jobs.names_abbr", math.random(1,22));
+			local sj = AshitaCore:GetResourceManager():GetString("jobs.names_abbr", math.random(1,22));
 
 			local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
 			setupPlayer:createSetupData(j, sj, partyIndex == 0)
@@ -253,7 +253,8 @@ function model:createSetupData()
 		self.parties[partyIndex][math.random(0,2)].isSelected = true
 
 		-- set a zone that is not the current zone for one player, to show off the zone name display
-		local zone = windower.ffxi.get_info().zone
+		local party = AshitaCore:GetMemoryManager():GetParty();
+		local zone = party:GetMemberZone(0);
 		if zone == 0 then
 			zone = zone + 1
 		else
@@ -285,12 +286,12 @@ function model:debugAddSetupPlayer(partyIndex)
 	if not partyIndex then partyIndex = 0 end
 
 	local setupParty = self.parties[partyIndex]
-	local i = #setupParty
+	local i = setupParty:length()
 
 	if i > 5 then error('Cannot add setup player, party full!') return end
 
-	local j = res.jobs[math.random(1,22)].ens
-	local sj = res.jobs[math.random(1,22)].ens
+	local j = AshitaCore:GetResourceManager():GetString("jobs.names_abbr", math.random(1,22));
+	local sj = AshitaCore:GetResourceManager():GetString("jobs.names_abbr", math.random(1,22));
 
 	local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
 	setupPlayer:createSetupData(j, sj, partyIndex == 0)
