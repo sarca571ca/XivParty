@@ -86,8 +86,8 @@ function model:GetMemberInformation(memIdx)
         memberInfo.mpp = party:GetMemberMPPercent(memIdx) / 100;
         memberInfo.maxmp = memberInfo.mp / memberInfo.mpp;
         memberInfo.tp = party:GetMemberTP(memIdx);
-        memberInfo.job = party:GetMemberMainJob(memIdx);
-		memberInfo.subJob = party:GetMemberSubJob(memIdx);
+	    memberInfo.job = AshitaCore:GetResourceManager():GetString("jobs.names_abbr", party:GetMemberMainJob(memIdx));
+		memberInfo.subJob =  AshitaCore:GetResourceManager():GetString("jobs.names_abbr", party:GetMemberSubJob(memIdx));
         memberInfo.level = party:GetMemberMainJobLevel(memIdx);
 		memberInfo.subLevel = party:GetMemberSubJobLevel(memIdx);
         memberInfo.serverid = party:GetMemberServerId(memIdx);

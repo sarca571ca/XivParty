@@ -62,7 +62,6 @@ function uiListItem:init(layout, player, isUiLocked, itemWidth, itemHeight)
 
 		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon, player))
 
-		print(tostring(layout.leader == nil));
 		self.txtName = self:addChild(uiText.new(layout.txtName))
 		self.txtZone = self:addChild(uiText.new(layout.txtZone))
 

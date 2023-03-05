@@ -116,7 +116,7 @@ function uiImage:dispose()
 end
 
 local function setPath(image, path)
-	image.texture = addon.path .. path;
+	image.wrappedImage.texture = addon.path .. path;
 
 	-- this is a workaround for image primitives showing up before their texture is loaded
 	-- only needed when switching from no texture to texture
@@ -131,7 +131,11 @@ end
 function uiImage:createPrimitives()
 	if not self.isEnabled or self.isCreated then return end
 
-	self.wrappedImage = images.new()
+	local images_setup = {
+		locked = true,
+	}
+
+	self.wrappedImage = images.new(images_setup);
 	RefCountImage = RefCountImage + 1
 	self.wrappedImage.locked = true;
 	self.wrappedImage.lockedz = true;
@@ -176,6 +180,7 @@ function uiImage:applyLayout()
 	if self.isCreated then
 		self.wrappedImage.position_x = self.absolutePos.x;
 		self.wrappedImage.position_y = self.absolutePos.y;
+		-- DO THIS NEXT (FIX THE SCALING)
 		self.wrappedImage.width = self.absoluteWidth;
 		self.wrappedImage.height = self.absoluteHeight;
 		self.wrappedImage.visible = self.absoluteVisibility;

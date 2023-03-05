@@ -115,14 +115,11 @@ function uiText:createPrimitives()
 
     local textSettings = {
         locked = true,
-        draw_flags = 0x10,
-        background = 
-        T{
-            visible = false,
-        },
-        right_justified = private[self].alignRight,
     }
     self.wrappedText = texts:new(textSettings)
+    self.wrappedText.draw_flags = 0x10;
+    self.wrappedText.right_justified = private[self].alignRight;
+    self.wrappedText.bold = true;
     RefCountText = RefCountText + 1
     if (private[self].font ~= nil) then
         self.wrappedText.font = private[self].font
