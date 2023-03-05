@@ -120,11 +120,10 @@ function uiText:createPrimitives()
     self.wrappedText.draw_flags = 0x10;
     self.wrappedText.right_justified = private[self].alignRight;
     self.wrappedText.bold = true;
-    RefCountText = RefCountText + 1
     if (private[self].font ~= nil) then
-        self.wrappedText.font = private[self].font
+        self.wrappedText.font_family = private[self].font
     else
-        self.wrappedText.font = 'Arial' -- Arial is the fallback font
+        self.wrappedText.font_family = 'Arial' -- Arial is the fallback font
     end
     setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
     self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, private[self].color.r, private[self].color.g, private[self].color.b), 16);
