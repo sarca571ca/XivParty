@@ -100,17 +100,17 @@ function settings:load(create, enable)
 				if create and not exists then
 					copySettings(self, self.jobSettings, jobDefaults) -- apply current global settings to new job file
 					self.jobSettings:save()
-					log('Created job settings for ' .. job .. ' and copied global settings.')
+					print('Created job settings for ' .. job .. ' and copied global settings.')
 				else
 					copySettings(self.jobSettings, self, jobDefaults) -- load job settings
-					log('Loaded job settings for ' .. job .. '.')
+					print('Loaded job settings for ' .. job .. '.')
 				end
 			end
 		end
 	end
 
 	if wasJobEnabled and not self.jobEnabled then
-		log('Global settings applied.')
+		print('Global settings applied.')
 	end
 
 	self:loadFilters()
@@ -147,7 +147,7 @@ function settings:loadFilters()
 
 	-- why use a custom CSV parser? because config.lua does not detect a list with a single element as a list >_>
 	if self.buffs.filters ~= '' then
-		for part in T(self.buffs.filters:split(';')):it() do
+		for k,part in pairs(T(self.buffs.filters:split(';'))) do
 			local buffIdString = part:trim()
 			if buffIdString ~= '' then
 				self.buffFilters[tonumber(buffIdString)] = true
@@ -195,7 +195,7 @@ end
 function settings:setUiPosition(posX, posY, partyIndex)
 	local partySettings = self:getPartySettings(partyIndex)
 
-	partySettings.pos = L{ posX / resX, posY / resY }
+	partySettings.pos = T{ posX / resX, posY / resY }
 end
 
 -- gets the UI scale
@@ -213,7 +213,7 @@ end
 function settings:setUiScale(scaleX, scaleY, partyIndex)
 	local partySettings = self:getPartySettings(partyIndex)
 
-	partySettings.scale = L{ scaleX, scaleY }
+	partySettings.scale = T{ scaleX, scaleY }
 end
 
-return settings
+return settings;

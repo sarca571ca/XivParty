@@ -27,7 +27,6 @@
 ]]
 
 -- windower library imports
-require('strings')
 
 local utils = {}
 
@@ -44,7 +43,7 @@ function utils:colorFromHex(hexString)
 	if length == 0 then return nil end
 
 	if not string.startswith(hexString, '#') or length < 7 or length > 9 then
-		utils:log('Invalid hexadecimal color code. Expected format #RRGGBB or #RRGGBBAA', 4)
+		utils:print('Invalid hexadecimal color code. Expected format #RRGGBB or #RRGGBBAA', 4)
 		return nil
 	end
 
@@ -61,7 +60,7 @@ function utils:colorFromHex(hexString)
 	return color
 end
 
--- interprets an L{} list with two elements as X,Y coordinates
+-- interprets an T{} list with two elements as X,Y coordinates
 function utils:coord(coordList)
 	local coord = {}
 
@@ -130,13 +129,13 @@ function utils:insertionSort(array, func)
     return array
 end
 
-function utils:log(text, level)
+function utils:print(text, level)
 	if level == nil then
 		level = 2 -- default log level: info
 	end
 
 	if self.level <= level and text then
-		windower.add_to_chat(8, text) -- message type "8" can be filtered in-game as "call for help"
+		print(text) -- message type "8" can be filtered in-game as "call for help"
 	end
 end
 
@@ -160,9 +159,9 @@ function utils:logTable(t, depth)
 	if type(t) == 'table' then
 		for key,value in pairs(t) do
 			if type(value) == 'table' then
-				windower.add_to_chat(8, indent .. key)
+				print(indent .. key)
 			elseif key ~= '_raw' and key ~= '_data' then
-				windower.add_to_chat(8, indent .. key .. ' = ' .. tostring(value) .. '(' .. type(value) .. ')')
+				print(indent .. key .. ' = ' .. tostring(value) .. '(' .. type(value) .. ')')
 			end
 			utils:logTable(value, depth + 3)
 		end

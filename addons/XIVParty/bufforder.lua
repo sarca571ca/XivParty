@@ -27,12 +27,11 @@
 ]]
 
 -- windower library imports
-require('lists')
 
 -- the order of entires in this list defines the sort order of buffs for all party members
 -- this file must be saved as UTF-8 without BOM (or ANSI if you don't care about the JP texts)
 -- name strings are not used and are only here for readability and easier copying from windower/res/buffs.lua
-local buffOrder = L{
+local buffOrder = T{
 	--------------------------------- debuffs / negative effects ----------------------------------
 
 	-- common debuffs
@@ -747,7 +746,7 @@ local buffOrder = L{
 local function getBuffOrderWithIdKeys(b)
 	local ret = {}
 	local sort = 0
-	for entry in b:it() do
+	for k,entry in pairs(b) do
 		ret[entry.id] = sort
 		sort = sort + 1
 	end

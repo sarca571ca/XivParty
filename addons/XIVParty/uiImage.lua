@@ -59,9 +59,9 @@ function uiImage.create(path, sizeX, sizeY, posX, posY, scaleX, scaleY)
 	local imageLayout = {}
 	imageLayout.enabled = true
 	imageLayout.path = path
-	imageLayout.size = L{ sizeX, sizeY }
-	imageLayout.pos = L{ posX, posY }
-	imageLayout.scale = L{ scaleX, scaleY }
+	imageLayout.size = T{ sizeX, sizeY }
+	imageLayout.pos = T{ posX, posY }
+	imageLayout.scale = T{ scaleX, scaleY }
 
 	return uiImage.new(imageLayout)
 end
@@ -134,7 +134,7 @@ function uiImage:createPrimitives()
 	self.wrappedImage = images.new()
 	RefCountImage = RefCountImage + 1
 	self.wrappedImage.locked = true;
-	self.wrappedImaged.lockedz = true;
+	self.wrappedImage.lockedz = true;
 	self.can_focus = false;
 	--self.wrappedImage:fit(false) -- scaling only works when 'fit' is false
 
@@ -174,9 +174,11 @@ function uiImage:applyLayout()
 	if not self.isEnabled then return end
 
 	if self.isCreated then
-		self.wrappedImage:pos(self.absolutePos.x, self.absolutePos.y)
-		self.wrappedImage:size(self.absoluteWidth, self.absoluteHeight)
-		self.wrappedImage:visible(self.absoluteVisibility)
+		self.wrappedImage.position_x = self.absolutePos.x;
+		self.wrappedImage.position_y = self.absolutePos.y;
+		self.wrappedImage.width = self.absoluteWidth;
+		self.wrappedImage.height = self.absoluteHeight;
+		self.wrappedImage.visible = self.absoluteVisibility;
 	end
 end
 
@@ -237,7 +239,7 @@ end
 -- @param b blue color value 0..255
 function uiImage:color(r, g, b)
 	if not self.isEnabled then return end
-	if r == nil then utils:log('uiImage:color missing parameter r!', 4) return end
+	if r == nil then utils:print('uiImage:color missing parameter r!', 4) return end
 
 	local a = nil
 
@@ -268,7 +270,7 @@ end
 -- @param a alpha value as integer in range 0 .. 255
 function uiImage:alpha(a)
     if not self.isEnabled then return end
-	if a == nil then utils:log('uiImage:alpha missing parameter a!', 4) return end
+	if a == nil then utils:print('uiImage:alpha missing parameter a!', 4) return end
 
 	if private[self].color.a ~= a then
 		private[self].color.a = a
@@ -283,7 +285,7 @@ end
 -- @param o opacity value as double in range 0.0 .. 1.0
 function uiImage:opacity(o)
     if not self.isEnabled then return end
-	if o == nil then utils:log('uiImage:opacity missing parameter o!', 4) return end
+	if o == nil then utils:print('uiImage:opacity missing parameter o!', 4) return end
 
 	if private[self].opacity ~= o then
 		private[self].opacity = o

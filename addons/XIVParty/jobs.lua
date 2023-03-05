@@ -27,8 +27,6 @@
 ]]
 
 -- windower library imports
-require('lists')
-
 -- imports
 local utils = require('utils')
 
@@ -70,7 +68,7 @@ jobs.roles = {
 
 -- model IDs are needed to resolve name conflicts between trust I / II variants
 -- for some trusts the ID is not available, but it will still work as long as the one that comes first in the list has an ID if the other doesnt
-jobs.trusts = L{
+jobs.trusts = T{
 	-- tanks
 	{ name = 'Amchuchu', job = 'RUN', subJob = 'WAR' },
 	{ name = 'ArkEV', job = 'PLD', subJob = 'WHM' },
@@ -218,7 +216,7 @@ function jobs:getRoleColor(job, jobIconColors)
 end
 
 function jobs:getTrustInfo(trustName, trustModel)
-	for t in jobs.trusts:it() do
+	for k,t in pairs(jobs.trusts) do
 		if t.name == trustName and (t.model == nil or t.model == trustModel) then
 			return t
 		end

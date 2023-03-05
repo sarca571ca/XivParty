@@ -27,13 +27,11 @@
 ]]
 
 -- windower library imports
-local res = require('resources')
-
 -- imports
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiJobIcon = require('uiJobIcon')
-local uiStatusBar = require('uiStatusBar')
+--local uiStatusBar = require('uiStatusBar')
 local uiLeader= require('uiLeader')
 local uiRange = require('uiRange')
 local uiBuffIcons = require('uiBuffIcons')

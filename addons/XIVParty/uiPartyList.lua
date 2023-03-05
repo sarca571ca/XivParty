@@ -40,9 +40,8 @@ local uiPartyList = classes.class(uiContainer)
 
 local isDebug = false
 
-local resX = windower.get_windower_settings().ui_x_res
-local resY = windower.get_windower_settings().ui_y_res
-
+local resX = AshitaCore:GetConfigurationManager():GetFloat('boot', 'ffxi.registry', '0001', 1024)
+local resY = AshitaCore:GetConfigurationManager():GetFloat('boot', 'ffxi.registry', '0002', 768)
 function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 	if self.super:init() then
 		self.layout = layout
@@ -52,8 +51,8 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 
 		self.listItems = T{} -- ordered list by party list position, index range 0..5
 
-		local scale = Settings:getUiScale(self.partyIndex)
-		local pos = Settings:getUiPosition(self.partyIndex)
+		local scale = getUiScale(self.partyIndex)
+		local pos = getUiPosition(self.partyIndex)
 
 		local saveSettings = false
 		local isMainParty = partyIndex == 0
@@ -64,11 +63,11 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 			scale.y = scale.x
 
 			if isMainParty then
-				log('Initializing UI scale: ' .. scale.x)
-				log('Type "//xp setup" to change UI position and scale using drag & drop and the mouse wheel.')
+				print('Initializing UI scale: ' .. scale.x)
+				print('Type "//xp setup" to change UI position and scale using drag & drop and the mouse wheel.')
 			end
 
-			Settings:setUiScale(scale.x, scale.y, self.partyIndex)
+			setUiScale(scale.x, scale.y, self.partyIndex)
 			saveSettings = true
 		end
 
@@ -76,21 +75,21 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		if pos.x >= resX then
 			pos.x = resX - layout.columns * layout.columnWidth * scale.x
 
-			log('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' X position to ' .. tostring(pos.x))
-			Settings:setUiPosition(pos.x, pos.y, self.partyIndex)
+			print('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' X position to ' .. tostring(pos.x))
+			setUiPosition(pos.x, pos.y, self.partyIndex)
 			saveSettings = true
 		end
 
 		if pos.y >= resY then
 			pos.y = resY - layout.rows * layout.rowHeight * scale.y
 
-			log('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' Y position to ' .. tostring(pos.y))
-			Settings:setUiPosition(pos.x, pos.y, self.partyIndex)
+			print('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' Y position to ' .. tostring(pos.y))
+			setUiPosition(pos.x, pos.y, self.partyIndex)
 			saveSettings = true
 		end
 
 		if saveSettings then
-			Settings:save()
+
 		end
 
         self.posX = pos.x
@@ -108,6 +107,7 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		self.isCtrlDown = false
 
 		-- register windower event handlers
+		--[[
 		self.keyboardHandlerId = windower.register_event('keyboard', function(key, down)
 			self:handleWindowerKeyboard(key, down)
 		end)
@@ -115,15 +115,16 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
 			return self:handleWindowerMouse(type, x, y, delta, blocked)
 		end)
+		]]--
 	end
 end
 
 function uiPartyList:dispose()
 	if not self.isEnabled then return end
-
+		--[[
     windower.unregister_event(self.keyboardHandlerId)
     windower.unregister_event(self.mouseHandlerId)
-
+		]]--
 	self.listItems:clear()
 
 	self.super:dispose()
@@ -137,7 +138,7 @@ function uiPartyList:setUiLocked(isUiLocked)
 	if not self.isEnabled then return end
 
 	self.isUiLocked = isUiLocked
-	for item in self.listItems:it() do
+	for k,item in pairs(self.listItems) do
 		item:setUiLocked(isUiLocked)
 	end
 end
@@ -255,8 +256,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
             if self.dragged then
 				Settings:setUiPosition(self.posX, self.posY, self.partyIndex)
 
-                log('\'' .. Settings:partyIndexToName(self.partyIndex) .. '\' position: ' .. self.posX .. ', ' .. self.posY)
-                Settings:save()
+                print('\'' .. Settings:partyIndexToName(self.partyIndex) .. '\' position: ' .. self.posX .. ', ' .. self.posY)
 
                 self.dragged = nil
                 return true
@@ -271,8 +271,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
 
 				Settings:setUiScale(sx, sy, self.partyIndex)
 
-				log('\'' .. Settings:partyIndexToName(self.partyIndex) .. '\' scale: ' .. sx .. ', ' .. sy)
-                Settings:save()
+				print('\'' .. Settings:partyIndexToName(self.partyIndex) .. '\' scale: ' .. sx .. ', ' .. sy)
 
 				return true
             end

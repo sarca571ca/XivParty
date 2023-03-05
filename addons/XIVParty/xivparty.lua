@@ -33,20 +33,15 @@ addon.version = '2.1.1'
 -- windower library imports
 gStatusLib = require('status.status');
 require('common')
-local packets = require('packets')
 local socket = require('socket')
-local res = require('resources')
-require('logger')
-require('strings')
-require('lists')
-require('tables')
 
 -- imports
 local const = require('const')
 local utils = require('utils')
 local uiView = require('uiView')
-local model = require('model').new()
-local settings = require('settings')
+--local model = require('model').new()
+settingsLib = require('settings')
+--local uiSettings = require('uiSettings');
 
 -- local and global variables
 local isInitialized = false
@@ -54,7 +49,6 @@ local isZoning = false
 local lastFrameTimeMsec = 0
 
 local view = nil
-Settings = nil
 
 local setupModel = nil
 local isSetupEnabled = false
@@ -70,8 +64,6 @@ RefCountText = 0
 
 local function init()
 	if not isInitialized then
-		Settings = settings.new(model)
-		Settings:load()
 		view = uiView.new(model) -- depends on settings, always create view after loading settings
 		isInitialized = true
 	end
@@ -83,11 +75,78 @@ local function dispose()
 			view:dispose()
 		end
 		view = nil
-		Settings = nil
 		isInitialized = false
 	end
 end
 
+local default_settings = require('defaults');
+Settings = settingsLib.load(default_settings);
+
+local resX = AshitaCore:GetConfigurationManager():GetFloat('boot', 'ffxi.registry', '0001', 1024)
+local resY = AshitaCore:GetConfigurationManager():GetFloat('boot', 'ffxi.registry', '0002', 768)
+
+function getPartySettings(partyIndex)
+	if partyIndex == 0 then return Settings.party end
+	if partyIndex == 1 then return Settings.alliance1 end
+	if partyIndex == 2 then return Settings.alliance2 end
+end
+
+function partyIndexToName(partyIndex)
+	if partyIndex == 0 then return 'main party' end
+	if partyIndex == 1 then return 'alliance 1' end
+	if partyIndex == 2 then return 'alliance 2' end
+end
+
+-- gets the UI position in screen coordinates
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function getUiPosition(partyIndex)
+	local partySettings = getPartySettings(partyIndex)
+
+	local pos = utils:coord(partySettings.pos)
+	return { x = utils:round(pos.x * resX), y = utils:round(pos.y * resY) }
+end
+
+-- sets the UI position and stores them as relative coordinates
+-- @param posX horizontal position in screen coordinates
+-- @param posY vertical position in screen coordinates
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function setUiPosition(posX, posY, partyIndex)
+	local partySettings = getPartySettings(partyIndex)
+
+	partySettings.pos = T{ posX / resX, posY / resY }
+end
+
+-- gets the UI scale
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function getUiScale(partyIndex)
+	local partySettings = getPartySettings(partyIndex)
+
+	return utils:coord(partySettings.scale)
+end
+
+-- sets the UI scale
+-- @param scaleX horizontal scale
+-- @param scaleY vertical scale
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function setUiScale(scaleX, scaleY, partyIndex)
+	local partySettings = getPartySettings(partyIndex)
+
+	partySettings.scale = T{ scaleX, scaleY }
+end
+
+
+settingsLib.register('settings', 'settings_update', function (s)
+    if (s ~= nil) then
+        Settings = s;
+		dispose();
+		init();
+    end
+	settingsLib.Save();
+end);
+
+
+
+--[[
 windower.register_event('load', function()
 	-- settings must only be loaded when logged in, as they are separate for every character
 	if windower.ffxi.get_info().logged_in then
@@ -108,11 +167,24 @@ windower.register_event('status change', function(status)
 		view:visible(not Settings.hideCutscene or status ~= 4, const.visCutscene) -- hide UI during cutscenes
 	end
 end)
+]]--
 
 local function isSolo()
-	return windower.ffxi.get_party().party1_leader == nil
+	local party = AshitaCore:GetMemoryManager():GetParty();
+	if (party == nil) then
+		return true
+	else
+		return not party:GetMemberIsActive(1);
+	end
 end
 
+local function CheckState()
+	if (gStatusLib.helpers.bLoggedIn) then
+		init();
+	else
+		dispose();
+	end
+end
 
 local function UpdatePartyInfo()
 	
@@ -121,20 +193,23 @@ end
 
 -- per frame updating
 ashita.events.register('d3d_present', 'present_cb', function ()
+	CheckState();
+
 	if isZoning or not isInitialized then return end
 
 	local timeMsec = socket.gettime() * 1000
 	if timeMsec - lastFrameTimeMsec < Settings.updateIntervalMsec then return end
 	lastFrameTimeMsec = timeMsec
 
-	Settings:update()
-	model:updatePlayers()
+--	Settings:update()
+--	model:updatePlayers()
 
 	view:visible(isSetupEnabled or not Settings.hideSolo or not isSolo(), const.visSolo)
 	view:update()
 end)
 
 -- packets
+--[[
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
 	if id == 0xC8 then -- alliance update
 		local packet = packets.parse('incoming', original)
@@ -155,12 +230,12 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 		if packet then
 			local playerId = packet['ID']
 			if playerId and playerId > 0 then
-				utils:log('PACKET: Char update for player ID: '..playerId, 0)
+				utils:print('PACKET: Char update for player ID: '..playerId, 0)
 
 				local foundPlayer = model:getPlayer(nil, playerId, 'char')
 				foundPlayer:updateJobFromPacket(packet)
 			else
-				utils:log('Char update: ID not found.', 1)
+				utils:print('Char update: ID not found.', 1)
 			end
 		end
 	end
@@ -171,12 +246,12 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 			local name = packet['Name']
 			local playerId = packet['ID']
 			if name and playerId and playerId > 0 then
-				utils:log('PACKET: Party member update for '..name, 0)
+				utils:print('PACKET: Party member update for '..name, 0)
 
 				local foundPlayer = model:getPlayer(name, playerId, 'party')
 				foundPlayer:updateJobFromPacket(packet)
 			else
-				utils:log('Party update: name and/or ID not found.', 1)
+				utils:print('Party update: name and/or ID not found.', 1)
 			end
 		end
 	end
@@ -199,20 +274,20 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 
 				local foundPlayer = model:getPlayer(nil, playerId, 'buffs')
 				foundPlayer:updateBuffs(buffsList)
-				utils:log('Updated buffs for player with ID ' .. tostring(playerId), 1)
+				utils:print('Updated buffs for player with ID ' .. tostring(playerId), 1)
 			end
 		end
 	end
 
 	if id == 0xB then -- zoning, also happens on log out
-		utils:log('Zoning...')
+		utils:print('Zoning...')
 		isZoning = true
 		model:clear() -- clear model only when zoning, this allows reloading the UI (for layout changes, etc) without losing party data
 		if isInitialized then
 			view:hide(const.visZoning)
 		end
 	elseif id == 0xA and isZoning then -- also happens on login
-		utils:log('Zoning done.')
+		utils:print('Zoning done.')
 		isZoning = false
 		coroutine.schedule(function()
 			if isInitialized then
@@ -225,28 +300,28 @@ end)
 -- commands / help
 
 local function showHelp()
-	log('Commands: //xivparty or //xp')
-	log('filter - hides specified buffs in party list. Use command \"buffs\" to find out IDs.')
-	log('   add <ID> - adds filter for a buff (e.g. //xp filter add 123)')
-	log('   remove <ID> - removes filter for a buff')
-	log('   clear - removes all filters')
-	log('   list - shows list of currently set filters')
-	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
-	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
-	log('range - display party member distances as icons or numeric values')
-	log('   <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
-	log('   num - numeric display mode, disables near/far markers.')
-	log('customOrder - toggles custom buff order (customize in bufforder.lua)')
-	log('hideSolo - hides the UI while solo')
-	log('hideAlliance - hides alliance party lists')
-	log('hideCutscene - hides the UI during cutscenes')
-	log('mouseTargeting - toggles targeting party members using the mouse')
-	log('swapSingleAlliance - shows single alliance in the 2nd alliance list')
-	log('alignBottom - expands the party list from bottom to top')
-	log('showEmptyRows - show empty rows in partially filled parties')
-	log('job - toggles job specific settings for current job')
-	log('setup - move the UI using drag and drop, hold CTRL for grid snap, mouse wheel to scale the UI')
-	log('layout <file> - loads a UI layout file')
+	print('Commands: //xivparty or //xp')
+	print('filter - hides specified buffs in party list. Use command \"buffs\" to find out IDs.')
+	print('   add <ID> - adds filter for a buff (e.g. //xp filter add 123)')
+	print('   remove <ID> - removes filter for a buff')
+	print('   clear - removes all filters')
+	print('   list - shows list of currently set filters')
+	print('   mode - switches between blacklist and whitelist mode (both use same filter list)')
+	print('buffs <name> - shows list of currently active buffs and their IDs for a party member')
+	print('range - display party member distances as icons or numeric values')
+	print('   <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
+	print('   num - numeric display mode, disables near/far markers.')
+	print('customOrder - toggles custom buff order (customize in bufforder.lua)')
+	print('hideSolo - hides the UI while solo')
+	print('hideAlliance - hides alliance party lists')
+	print('hideCutscene - hides the UI during cutscenes')
+	print('mouseTargeting - toggles targeting party members using the mouse')
+	print('swapSingleAlliance - shows single alliance in the 2nd alliance list')
+	print('alignBottom - expands the party list from bottom to top')
+	print('showEmptyRows - show empty rows in partially filled parties')
+	print('job - toggles job specific settings for current job')
+	print('setup - move the UI using drag and drop, hold CTRL for grid snap, mouse wheel to scale the UI')
+	print('layout <file> - loads a UI layout file')
 end
 
 local function handleCommand(currentValue, argsString, text, option1String, option1Value, option2String, option2Value, isNowText)
@@ -274,7 +349,7 @@ local function handleCommand(currentValue, argsString, text, option1String, opti
 	if setValue == option2Value then
 		setString = option2String
 	end
-	log(text .. ' ' .. isNowText .. ' ' .. setString .. '.')
+	print(text .. ' ' .. isNowText .. ' ' .. setString .. '.')
 
 	return setValue
 end
@@ -357,6 +432,7 @@ local function setSetupEnabled(enabled)
 	view:setUiLocked(not isSetupEnabled)
 end
 
+--[[ TODO: Turn into config window
 windower.register_event('addon command', function(...)
 	local args = T{...}
 	local command
@@ -405,7 +481,7 @@ windower.register_event('addon command', function(...)
 				Settings.rangeIndicator = 0
 				Settings.rangeIndicatorFar = 0
 				Settings:save()
-				log('Range numeric display mode enabled.')
+				print('Range numeric display mode enabled.')
 			else
 				local range1 = getRange(args[2])
 				local range2 = getRange(args[3])
@@ -418,13 +494,13 @@ windower.register_event('addon command', function(...)
 							Settings.rangeIndicator = range2
 							Settings.rangeIndicatorFar = range1
 						end
-						log('Range indicators set to near ' .. tostring(Settings.rangeIndicator) .. ', far ' .. tostring(Settings.rangeIndicatorFar) .. '.')
+						print('Range indicators set to near ' .. tostring(Settings.rangeIndicator) .. ', far ' .. tostring(Settings.rangeIndicatorFar) .. '.')
 					else
 						Settings.rangeIndicatorFar = 0
 						if range1 > 0 then
-							log('Range indicator set to ' .. tostring(Settings.rangeIndicator) .. '.')
+							print('Range indicator set to ' .. tostring(Settings.rangeIndicator) .. '.')
 						else
-							log('Range indicator disabled.')
+							print('Range indicator disabled.')
 						end
 					end
 					Settings:save()
@@ -442,7 +518,7 @@ windower.register_event('addon command', function(...)
 				Settings:save()
 				if setupModel then setupModel:refreshFilteredBuffs() end
 				model:refreshFilteredBuffs()
-				log('Added buff filter for ' .. getBuffText(buffId))
+				print('Added buff filter for ' .. getBuffText(buffId))
 			end
 		elseif subCommand == 'remove' then
 			local buffId = tonumber(args[3])
@@ -451,19 +527,19 @@ windower.register_event('addon command', function(...)
 				Settings:save()
 				if setupModel then setupModel:refreshFilteredBuffs() end
 				model:refreshFilteredBuffs()
-				log('Removed buff filter for ' .. getBuffText(buffId))
+				print('Removed buff filter for ' .. getBuffText(buffId))
 			end
 		elseif subCommand == 'clear' then
 			Settings.buffFilters = T{}
 			Settings:save()
 			if setupModel then setupModel:refreshFilteredBuffs() end
 			model:refreshFilteredBuffs()
-			log('All buff filters cleared.')
+			print('All buff filters cleared.')
 		elseif subCommand == 'list' then
-			log('Currently active buff filters (' .. Settings.buffs.filterMode .. '):')
+			print('Currently active buff filters (' .. Settings.buffs.filterMode .. '):')
 			for buffId, doFilter in pairs(Settings.buffFilters) do
 				if doFilter then
-					log(getBuffText(buffId))
+					print(getBuffText(buffId))
 				end
 			end
 		elseif subCommand == 'mode' then
@@ -483,18 +559,18 @@ windower.register_event('addon command', function(...)
 			local foundPlayer = model:findPlayer(playerName)
 			if foundPlayer then
 				buffs = foundPlayer.buffs
-				log(playerName .. '\'s active buffs:')
+				print(playerName .. '\'s active buffs:')
 			else
 				error('Player ' .. playerName .. ' not found.')
 				return
 			end
 		else
 			buffs = windower.ffxi.get_player().buffs
-			log('Your active buffs:')
+			print('Your active buffs:')
 		end
 		for i = 1, const.maxBuffs do
 			if buffs[i] then
-				log(getBuffText(buffs[i]))
+				print(getBuffText(buffs[i]))
 			end
 		end
 	elseif command == 'layout' then
@@ -506,7 +582,7 @@ windower.register_event('addon command', function(...)
 			local filename = const.layoutDir .. args[2] .. const.xmlExtension
 
 			if windower.file_exists(windower.addon_path .. filename) then
-				log('Loading layout \'' .. args[2] .. '\'.')
+				print('Loading layout \'' .. args[2] .. '\'.')
 
 				Settings.layout = args[2]
 				Settings:save()
@@ -525,20 +601,20 @@ windower.register_event('addon command', function(...)
 		if ret then
 			if not Settings.jobEnabled then
 				Settings:load(true, true)
-				log('Settings changes to range and buffs will now only affect this job.')
+				print('Settings changes to range and buffs will now only affect this job.')
 			end
 		elseif Settings.jobEnabled then
 			Settings.jobEnabled = false
 			Settings:save()
 			Settings:load()
-			log('Global settings applied. The job specific settings for ' .. job .. ' will remain saved for later use.')
+			print('Global settings applied. The job specific settings for ' .. job .. ' will remain saved for later use.')
 		end
 	elseif command == 'debug' then
 		local subCommand = string.lower(args[2])
 		if subCommand == 'savelayout' then
 			view:debugSaveLayout()
 		elseif subCommand == 'refcount' then
-			log('Images: ' .. RefCountImage .. ', Texts: ' .. RefCountText)
+			print('Images: ' .. RefCountImage .. ', Texts: ' .. RefCountText)
 		elseif subCommand == 'setbar' and args[3] ~= nil and setupModel then -- example: //xp debug setbar hpp 50 0 2
 			setupModel:debugSetBarValue(args[3], tonumber(args[4]), tonumber(args[5]), tonumber(args[6]))
 		elseif subCommand == 'addplayer' and setupModel then
@@ -560,3 +636,4 @@ windower.register_event('keyboard', function(key, down)
 		view:visible(not down, const.visKeyboard)
 	end
 end)
+]]--

@@ -27,8 +27,6 @@
 ]]
 
 -- windower library imports
-require('tables')
-
 -- imports
 local classes = require('classes')
 local uiElement = require('uiElement')
@@ -38,7 +36,7 @@ local utils = require('utils')
 local uiContainer = classes.class(uiElement)
 
 -- constructor
--- @param layout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
+-- @param layout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (T{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
 function uiContainer:init(layout)
     self.super:init(layout)
@@ -65,7 +63,7 @@ function uiContainer:addChild(child)
     if not self.isEnabled then return end
 
     if not child:instanceOf(uiElement) then
-        utils:log('Failed to add UI child. Class must derive from uiElement!', 4)
+        utils:print('Failed to add UI child. Class must derive from uiElement!', 4)
         return nil
     end
 
@@ -96,7 +94,7 @@ end
 function uiContainer:clearChildren(dispose)
     if not self.isEnabled then return end
 
-    for child in self.children:it() do
+    for k,child in pairs(self.children) do
         child.parent = nil
 
         if dispose then
@@ -118,7 +116,7 @@ function uiContainer:createPrimitives()
     -- sort children by z-order ascending
     utils:insertionSort(self.children, function(a, b) return a.zOrder > b.zOrder end)
 
-    for child in self.children:it() do
+    for k,child in pairs(self.children) do
         child:createPrimitives()
     end
 
@@ -131,7 +129,7 @@ function uiContainer:layoutElement()
 
     self.super:layoutElement()
 
-    for child in self.children:it() do
+    for k,child in pairs(self.children) do
         child:layoutElement()
     end
 end
@@ -141,7 +139,7 @@ function uiContainer:update()
 
     self.super:update()
 
-    for child in self.children:it() do
+    for k,child in pairs(self.children) do
         child:update()
     end
 end

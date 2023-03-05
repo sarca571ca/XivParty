@@ -27,7 +27,6 @@
 ]]
 
 -- windower library imports
-local res = require('resources')
 
 -- imports
 local classes = require('classes')
@@ -98,11 +97,11 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 	local foundById
 
 	if not name and not id then
-		utils:log('Attempted a player lookup without name and ID.', 4)
+		utils:print('Attempted a player lookup without name and ID.', 4)
 		return nil
 	end
 
-	for ap in self.allPlayers:it() do
+	for k,ap in pairs(self.allPlayers) do
 		if name and ap.name == name then
 			foundByName = ap
 		end
@@ -115,7 +114,7 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 	if foundByName and foundById and foundByName ~= foundById then
 		-- both have an ID but it is not the same, this can happen if players/trusts left the party and are still in the allPlayers list
 		if foundByName.id ~= nil and foundById.id ~= nil and foundByName.id > 0 and foundById.id > 0 and foundByName.id ~= foundById.id then
-			utils:log('ID conflict finding player, returning player with higher ID.', 2)
+			utils:print('ID conflict finding player, returning player with higher ID.', 2)
 
 			-- use the player with the higher ID (most likely newer, confirmed true for trusts)
 			if foundByName.id > foundById.id then
@@ -137,7 +136,7 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 		end
 
 		if not foundPlayer and not dontCreate then
-			utils:log('Creating new player (' .. debugTag .. ')', 2)
+			utils:print('Creating new player (' .. debugTag .. ')', 2)
 			foundPlayer = player.new(name, id, self)
 			self.allPlayers:append(foundPlayer)
 		end
@@ -155,7 +154,7 @@ end
 function model:findPartyLeader(partyIndex)
 	if not partyIndex then partyIndex = 0 end
 
-    for p in self.parties[partyIndex]:it() do
+    for k,p in pairs(self.parties[partyIndex]) do
         if p.isLeader then
             return p
         end
@@ -165,7 +164,7 @@ function model:findPartyLeader(partyIndex)
 end
 
 function model:refreshFilteredBuffs()
-	for p in self.parties[0]:it() do -- alliance members do not have buff information, only iterate the main party list as a minor optimization
+	for k,p in pairs(self.parties[0]) do -- alliance members do not have buff information, only iterate the main party list as a minor optimization
 		p:refreshFilteredBuffs()
 	end
 end

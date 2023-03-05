@@ -26,15 +26,13 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
--- windower library imports
-local config = require('config')
-
 -- imports
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiPartyList = require('uiPartyList')
 local layoutDefaults = require('layout')
 local const = require('const')
+chat = require('chat');
 
 -- create the class, derive from uiContainer
 local uiView = classes.class(uiContainer)
@@ -50,22 +48,51 @@ end
 local function checkLayout(layoutName)
 	local layoutFile = getLayoutFileNames(layoutName)
 
-	if not windower.file_exists(windower.addon_path .. layoutFile) then
-		log('Layout \'' .. layoutName .. '\' not found. Reverting to default \'' .. const.defaultLayout .. '\'.')
+	if not ashita.fs.exists(addon.path .. layoutFile) then
+		print('Layout \'' .. layoutName .. '\' not found. Reverting to default \'' .. const.defaultLayout .. '\'.')
 
 		Settings.layout = const.defaultLayout
-		Settings:save()
 	end
+end
+
+function Error(text)
+    local color = ('\30%c'):format(68);
+    local highlighted = color .. string.gsub(text, '$H', '\30\01\30\02');
+    highlighted = string.gsub(highlighted, '$R', '\30\01' .. color);
+    print(chat.header(addon.name) .. highlighted .. '\30\01');
+end
+
+function LoadFile_s(filePath)
+
+    if not ashita.fs.exists(filePath) then
+        return nil;
+    end
+
+    local success, loadError = loadfile(filePath);
+    if not success then
+        Error(string.format('Failed to load resource file: $H%s', filePath));
+        Error(loadError);
+        return nil;
+    end
+
+    local result, output = pcall(success);
+    if not result then
+        Error(string.format('Failed to execute resource file: $H%s', filePath));
+        Error(loadError);
+        return nil;
+    end
+
+    return output;
 end
 
 local function loadLayout(layoutName)
 	local layoutFile, layoutAllianceFile = getLayoutFileNames(layoutName)
 
-	local layout = config.load(layoutFile, layoutDefaults)
+	local layout = LoadFile_s(addon.path .. layoutFile);
 	local layoutAlliance
 
-	if windower.file_exists(windower.addon_path .. layoutAllianceFile) then
-		layoutAlliance = config.load(layoutAllianceFile, layoutDefaults)
+	if ashita.fs.exists(addon.path .. layoutAllianceFile) then
+		layoutAlliance = LoadFile_s(addon.path .. layoutAllianceFile);
 	else
 		layoutAlliance = layout
 	end
@@ -136,7 +163,7 @@ function uiView:debugSaveLayout()
 	self.layout:save()
 	self.layoutAlliance:save();
 
-	log('Layout saved.')
+	print('Layout saved.')
 end
 
 return uiView

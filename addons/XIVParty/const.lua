@@ -31,11 +31,11 @@ local const = {
     barTypeMp = 'barTypeMp',
     barTypeTp = 'barTypeTp',
 
-	xmlExtension = '.xml',
+	xmlExtension = '.lua',
 	dataDir = 'data/',
     layoutDir = 'layouts/',
     layoutAllianceSuffix = '_alliance',
-	defaultLayout = 'xiv',
+	defaultLayout = 'ffxi',
 
 	maxBuffs = 32,
 	baseResY = 1440, -- default positions and scales are based on a 1440p screen

@@ -27,8 +27,6 @@
 ]]
 
 -- windower library imports
-local res = require('resources')
-
 -- imports
 local classes = require('classes')
 local jobs = require('jobs')
@@ -43,7 +41,7 @@ local player = classes.class()
 -- model can be nil, only required for party leader lookup for trust levels
 function player:init(name, id, model)
 	if not name and not id then
-		utils:log('player:init missing parameter name or id!', 4)
+		utils:print('player:init missing parameter name or id!', 4)
 		return
 	end
 
@@ -54,7 +52,7 @@ function player:init(name, id, model)
 	if id then
 		initText = initText .. '. ID = ' .. tostring(id)
 	end
-	utils:log('Initializing player' .. initText, 2)
+	utils:print('Initializing player' .. initText, 2)
 
 	self.name = name
 	self.id = id
@@ -63,7 +61,7 @@ end
 
 -- merges data from other player into self
 function player:merge(other)
-	utils:log('Merging player ' .. utils:toString(other.name) .. '(' .. utils:toString(other.id) .. ')' ..
+	utils:print('Merging player ' .. utils:toString(other.name) .. '(' .. utils:toString(other.id) .. ')' ..
 			  ' into ' .. utils:toString(self.name) .. '(' .. utils:toString(self.id) .. ')', 2)
 
 	if other.name ~= nil then self.name = other.name end
@@ -225,9 +223,9 @@ function player:updateJobFromPacket(packet)
 		self.subJob = res.jobs[sJob].ens
 		self.subJobLvl = sJobLvl
 
-		utils:log('Set job info: '.. self.job ..tostring(mJobLvl)..'/'.. self.subJob ..tostring(sJobLvl), 0)
+		utils:print('Set job info: '.. self.job ..tostring(mJobLvl)..'/'.. self.subJob ..tostring(sJobLvl), 0)
 	else
-		utils:log('Unusable job info. Dropping.', 0)
+		utils:print('Unusable job info. Dropping.', 0)
 	end
 end
 
@@ -262,6 +260,10 @@ function player:createSetupData(job, subJob, isMainParty)
 	end
 
 	self:updateBuffs(self.buffs)
+end
+
+player.UpdatePlayer = function()
+
 end
 
 return player

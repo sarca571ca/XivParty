@@ -27,8 +27,6 @@
 ]]
 
 -- windower library imports
-require('tables')
-
 -- imports
 local classes = require('classes')
 local utils = require('utils')
@@ -41,7 +39,7 @@ local uiElement = classes.class()
 local private = {}
 
 -- constructor
--- @param layout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
+-- @param layout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (T{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
 function uiElement:init(layout)
     private[self] = {}

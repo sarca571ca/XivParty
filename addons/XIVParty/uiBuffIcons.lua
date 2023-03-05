@@ -86,11 +86,11 @@ function uiBuffIcons:validateLayout(layout)
 	-- the config library loads lists with single entires as numbers, apply a fix here as the rest of the code expects a list
 	local singleEntry = false
 	if type(layout.numIconsByRow) == 'number' then
-		layout.numIconsByRow = L{ layout.numIconsByRow }
+		layout.numIconsByRow = T{ layout.numIconsByRow }
 		singleEntry = true
 	end
 	if type(layout.offsetByRow) == 'number' then
-		layout.offsetByRow = L{ layout.offsetByRow }
+		layout.offsetByRow = T{ layout.offsetByRow }
 		singleEntry = true
 	end
 	if singleEntry then
@@ -109,7 +109,7 @@ end
 -- gets the row index for the specified icon index, returns nil if the icon won't fit in the defined rows
 function uiBuffIcons:getRow(iconIndex)
 	for row = 1, self.layout.numIconsByRow:length() do
-		local numIcons = tonumber(self.layout.numIconsByRow[row]) -- numbers in L{} lists are loaded as strings by the config library
+		local numIcons = tonumber(self.layout.numIconsByRow[row]) -- numbers in T{} lists are loaded as strings by the config library
 
 		if iconIndex <= numIcons then return row end
 		iconIndex = iconIndex - numIcons

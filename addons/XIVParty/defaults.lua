@@ -46,22 +46,22 @@ local defaults = {
 	updateIntervalMsec = 30, -- the UI update interval in milliseconds, changing this will affect animation speeds and general performance
 
 	party = {
-		pos = L{ 0.015625, 0.4791666 }, -- relative coordinates, resolution independent (range 0.0 to 1.0)
-		scale = L{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
+		pos = T{ 0.015625, 0.4791666 }, -- relative coordinates, resolution independent (range 0.0 to 1.0)
+		scale = T{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
 		itemSpacing = 0, -- distance between party list items
 		alignBottom = false, -- expands the party list from bottom to top
 		showEmptyRows = false -- show empty rows in partially full parties
 	},
 	alliance1 = {
-		pos = L{ 0.8671875, 0.5277777 },
-		scale = L{ 0, 0 },
+		pos = T{ 0.8671875, 0.5277777 },
+		scale = T{ 0, 0 },
 		itemSpacing = 0,
 		alignBottom = false,
 		showEmptyRows = false
 	},
 	alliance2 = {
-		pos = L{ 0.8671875, 0.5972222 },
-		scale = L{ 0, 0 },
+		pos = T{ 0.8671875, 0.5972222 },
+		scale = T{ 0, 0 },
 		itemSpacing = 0,
 		alignBottom = false,
 		showEmptyRows = false
