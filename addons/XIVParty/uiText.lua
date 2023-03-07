@@ -153,7 +153,7 @@ function uiText:applyLayout()
     ]]--
     self.wrappedText:set_position_x(x);
     self.wrappedText:set_position_y(y);
-    self.wrappedText:set_font_height(math.floor(private[self].fontSize * self.absoluteScale.y) + 2) -- add 2 to account for diff between windows and ashita
+    self.wrappedText:set_font_height(math.floor(private[self].fontSize * self.absoluteScale.y) + 2) -- add 2 to account for diff between windower and ashita
     self.wrappedText:set_outline_width(private[self].strokeWidth * self.absoluteScale.x)
     self.wrappedText:set_visible(self.absoluteVisibility);
 end
