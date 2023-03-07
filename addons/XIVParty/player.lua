@@ -234,6 +234,7 @@ function player:updateJobFromPacket(packet)
 end
 
 function player:createSetupData(job, subJob, isMainParty)
+
 	self.hp = math.random(500,2500)
 	self.mp = math.random(500,1500)
 	self.tp = math.random(0,3000)
@@ -265,6 +266,7 @@ function player:createSetupData(job, subJob, isMainParty)
 	end
 
 	self:updateBuffs(self.buffs)
+
 end
 
 player.UpdatePlayer = function()

@@ -27,7 +27,7 @@
 ]]
 
 -- windower library imports
-local images = require('primitives')
+local images = require('sprites')
 
 -- imports
 local classes = require('classes')
@@ -116,7 +116,7 @@ function uiImage:dispose()
 end
 
 local function setPath(image, path)
-	image.wrappedImage.texture = addon.path .. path;
+	image.wrappedImage:SetPath(addon.path .. path);
 
 	-- this is a workaround for image primitives showing up before their texture is loaded
 	-- only needed when switching from no texture to texture
@@ -135,7 +135,7 @@ function uiImage:createPrimitives()
 		locked = true,
 	}
 
-	self.wrappedImage = images.new(images_setup);
+	self.wrappedImage = images:new();
 	RefCountImage = RefCountImage + 1
 	self.wrappedImage.locked = true;
 	self.wrappedImage.lockedz = true;
@@ -143,7 +143,7 @@ function uiImage:createPrimitives()
 	--self.wrappedImage:fit(false) -- scaling only works when 'fit' is false
 
 	--self.wrappedImage:repeat_xy(private[self].repeatX, private[self].repeatY) TODO
-	self.wrappedImage.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a * private[self].opacity, private[self].color.r, private[self].color.g, private[self].color.b), 16);
+	self.wrappedImage:SetColor(string.format('%02x%02x%02x%02x', private[self].color.a * private[self].opacity, private[self].color.r, private[self].color.g, private[self].color.b), 16);
 
 	if private[self].path then
 		setPath(self, private[self].path)
@@ -263,7 +263,7 @@ function uiImage:color(r, g, b)
 		private[self].color.b = b
 
         if self.isCreated then
-			self.wrappedImage.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, r, g, b), 16);
+			self.wrappedImage:SetColor(string.format('%02x%02x%02x%02x', private[self].color.a, r, g, b), 16);
 		end
     end
 
@@ -282,7 +282,7 @@ function uiImage:alpha(a)
 		private[self].color.a = a
 
 		if self.isCreated then
-			self.wrappedImage.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a * private[self].opacity, private[self].color.r, private[self].color.g, private[self].color.b), 16);
+			self.wrappedImage:SetColor(string.format('%02x%02x%02x%02x', private[self].color.a * private[self].opacity, private[self].color.r, private[self].color.g, private[self].color.b), 16);
 		end
 	end
 end
@@ -297,7 +297,7 @@ function uiImage:opacity(o)
 		private[self].opacity = o
 
 		if self.isCreated then
-			self.wrappedImage.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a * private[self].opacity, private[self].color.r, private[self].color.g, private[self].color.b), 16);
+			self.wrappedImage:SetColor(string.format('%02x%02x%02x%02x', private[self].color.a * private[self].opacity, private[self].color.r, private[self].color.g, private[self].color.b), 16);
 		end
 	end
 end
