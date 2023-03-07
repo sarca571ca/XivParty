@@ -33,6 +33,7 @@ local texts = require('fonts')
 local classes = require('classes')
 local uiElement = require('uiElement')
 local utils = require('utils')
+local sprites = require('sprites');
 
 -- create the class, derive from uiElement
 local uiText = classes.class(uiElement)
@@ -88,6 +89,7 @@ function uiText:dispose()
     if not self.isEnabled then return end
 
     if self.isCreated then
+        sprites.textRenderInfo[self.renderKey] = nil;
         self.wrappedText:destroy();
         RefCountText = RefCountText - 1
     end
@@ -117,7 +119,7 @@ function uiText:createPrimitives()
         locked = true,
     }
     self.wrappedText = texts:new(textSettings)
-    self.wrappedText.draw_flags = 0x10;
+    self.wrappedText.draw_flags = bit.bor(FontDrawFlags.Outlined, FontDrawFlags.ManualRender);
     self.wrappedText.right_justified = private[self].alignRight;
     self.wrappedText.bold = true;
     if (private[self].font ~= nil) then
@@ -128,6 +130,8 @@ function uiText:createPrimitives()
     setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
     self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, private[self].color.r, private[self].color.g, private[self].color.b), 16);
     self.wrappedText.color_outline = tonumber(string.format('%02x%02x%02x%02x', private[self].stroke.a, private[self].stroke.r, private[self].stroke.g, private[self].stroke.b), 16);
+    self.renderKey = sprites.textRenderInfo:length() .. tostring(self);
+    sprites.textRenderInfo[self.renderKey] = self.wrappedText;
     self.super:createPrimitives() -- this will call applyLayout()
 end
 

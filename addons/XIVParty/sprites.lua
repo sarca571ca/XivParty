@@ -13,6 +13,9 @@ local renderInfo = T{};
 
 local sprites = {};
 
+-- Reference to manually rendered text so that we can render over these sprites
+sprites.textRenderInfo = T{};
+
 local sprite = nil;
 
 local function create_sprite()
@@ -80,8 +83,7 @@ end
 -- expected to extract A R G B from a hex color 0xFFFFFFFF
 function sprites:SetColor(newColor)
 	local a,r,g,b = hex2argb(newColor);
-	self.alpha = a or 255;
-	self.color = {r or 255, g or 255, b or 255};
+	self.color = d3d8.D3DCOLOR_ARGB(a or 255, r or 255, g or 255, b or 255);
 end
 
 function sprites:ClearTexture()
@@ -106,9 +108,7 @@ function sprites:new()
 	o.position_y = 0;
 	o.height = 0;
 	o.width = 0;
-	o.color = 0xFFFFFFFF;
-	o.alpha = 255;
-	o.color = {255,255,255};
+	o.color = d3d8.D3DCOLOR_ARGB(255, 255, 255, 255);
 	o.texture = nil;
 	o.rect = ffi.new('RECT', { 0, 0, 32, 32, });
 	o.vec_position = ffi.new('D3DXVECTOR2', { 0, 0, });
@@ -132,17 +132,20 @@ ashita.events.register('d3d_present', '__sprites_present_cb', function ()
 			sprite:Begin();
 
 			-- collect our information for rendering
-			local color = d3d8.D3DCOLOR_ARGB(v.alpha, v.color[1], v.color[2], v.color[3]);
 			v.rect.right = v.width;
 			v.rect.bottom = v.height;
 			v.vec_position.x = v.position_x;
 			v.vec_position.y = v.position_y;
 			v.vec_scale.x = v.scale_x;
 			v.vec_scale.y = v.scale_y;
-			sprite:Draw(v.texture, v.rect, v.vec_scale, nil, 0.0, v.vec_position, color);
+			sprite:Draw(v.texture, v.rect, v.vec_scale, nil, 0.0, v.vec_position, v.color);
 
 			sprite:End();
 		end
+	end
+
+	for k,v in pairs(sprites.textRenderInfo) do
+		v:render();
 	end
 end);
 

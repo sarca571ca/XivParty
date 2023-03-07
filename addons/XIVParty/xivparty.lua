@@ -224,7 +224,6 @@ ashita.events.register('command', 'command_cb', function (e)
 		setSetupEnabled(not isSetupEnabled);
 		e.blocked = true;
 	end
-
 end);
 
 -- packets
