@@ -71,7 +71,8 @@ local function setSetupEnabled(enabled)
 
 	view:setModel(isSetupEnabled and setupModel or model) -- lua style ternary operator
 
---	view:setUiLocked(not isSetupEnabled)
+	view:setUiLocked(not isSetupEnabled)
+
 end
 
 local function init()

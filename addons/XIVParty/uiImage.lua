@@ -131,10 +131,6 @@ end
 function uiImage:createPrimitives()
 	if not self.isEnabled or self.isCreated then return end
 
-	local images_setup = {
-		locked = true,
-	}
-
 	self.wrappedImage = images:new();
 	RefCountImage = RefCountImage + 1
 	self.wrappedImage.locked = true;

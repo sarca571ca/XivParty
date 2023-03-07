@@ -7,6 +7,7 @@ local d3d8 = require('d3d8');
 local ffi = require('ffi');
 local d3d8_device = d3d8.get_device();
 
+local imageCache = {};
 
 local sprites = {};
 
@@ -19,6 +20,12 @@ local function CreateSprite()
 end	
 
 local function load_image_from_path(path)
+
+	-- retrieve cached image
+	if (imageCache[path] ~= nil) then
+		return imageCache[path][1], imageCache[path][2], imageCache[path][3];
+	end
+
     local supports_alpha = false;
 
     if (path == nil or path == '' or not ashita.fs.exists(path)) then
@@ -28,19 +35,26 @@ local function load_image_from_path(path)
     local dx_texture_ptr = ffi.new('IDirect3DTexture8*[1]');
 	local imageInfo = ffi.new('D3DXIMAGE_INFO');
 
+	local returnImage = nil;
     if (supports_alpha) then
         -- use the native transaparency
         if (ffi.C.D3DXCreateTextureFromFileA(d3d8_device, path, dx_texture_ptr) == ffi.C.S_OK) then
-            return d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
+            returnImage = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
         end
     else
         -- use black as colour-key for transparency
         if (ffi.C.D3DXCreateTextureFromFileExA(d3d8_device, path, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0, ffi.C.D3DFMT_A8R8G8B8, ffi.C.D3DPOOL_MANAGED, ffi.C.D3DX_DEFAULT, ffi.C.D3DX_DEFAULT, 0xFF000000, imageInfo, nil, dx_texture_ptr) == ffi.C.S_OK) then
-            return d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0])), imageInfo.Width, imageInfo.Height;
+            returnImage = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
         end
     end
 
-    return nil, 0, 0;
+	-- cache our image and return if it's valid
+	if (returnImage ~= nil) then
+		imageCache[path] = {returnImage, imageInfo.Width, imageInfo.Height};
+		return returnImage, imageInfo.Width, imageInfo.Height
+	else
+    	return nil, 0, 0;
+	end
 end
 
 -- reset the icon cache and release all resources
@@ -124,6 +138,7 @@ function sprites:new()
 end
 
 function sprites:destroy()
+	print('fert');
 	if (self.d3dEvent ~= nil) then
 		ashita.events.unregister('d3d_present', self.d3dEvent);
 	end
