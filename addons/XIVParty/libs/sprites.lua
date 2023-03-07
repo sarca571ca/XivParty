@@ -125,25 +125,25 @@ end
 
 -- Render everything that is in our renderinfo
 ashita.events.register('d3d_present', '__sprites_present_cb', function ()
+	if (sprite ~= nil) then
+		sprite:Begin();
+		for k,v in pairs(renderInfo) do
+			if (v.visible and v.texture ~= nil) then
 
-	for k,v in pairs(renderInfo) do
-		if (v.visible and v.texture ~= nil and sprite ~= nil) then
+				-- collect our information for rendering
+				v.rect.right = v.width;
+				v.rect.bottom = v.height;
+				v.vec_position.x = v.position_x;
+				v.vec_position.y = v.position_y;
+				v.vec_scale.x = v.scale_x;
+				v.vec_scale.y = v.scale_y;
+				sprite:Draw(v.texture, v.rect, v.vec_scale, nil, 0.0, v.vec_position, v.color);
 
-			sprite:Begin();
 
-			-- collect our information for rendering
-			v.rect.right = v.width;
-			v.rect.bottom = v.height;
-			v.vec_position.x = v.position_x;
-			v.vec_position.y = v.position_y;
-			v.vec_scale.x = v.scale_x;
-			v.vec_scale.y = v.scale_y;
-			sprite:Draw(v.texture, v.rect, v.vec_scale, nil, 0.0, v.vec_position, v.color);
-
-			sprite:End();
+			end
 		end
+		sprite:End();
 	end
-
 	for k,v in pairs(sprites.textRenderInfo) do
 		v:render();
 	end

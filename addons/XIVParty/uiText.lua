@@ -27,13 +27,12 @@
 ]]
 
 -- windower library imports
-local texts = require('fonts')
-
+local texts = require('libs/gdifonts/gdifonts')
+texts:create_interface();
 -- imports
 local classes = require('classes')
 local uiElement = require('uiElement')
 local utils = require('utils')
-local sprites = require('sprites');
 
 -- create the class, derive from uiElement
 local uiText = classes.class(uiElement)
@@ -89,8 +88,7 @@ function uiText:dispose()
     if not self.isEnabled then return end
 
     if self.isCreated then
-        sprites.textRenderInfo[self.renderKey] = nil;
-        self.wrappedText:destroy();
+        texts:destroy_object(self.wrappedText);
         RefCountText = RefCountText - 1
     end
     private[self] = nil
@@ -107,31 +105,37 @@ local function setTrimmedText(wrappedText, text, maxChars)
     end
     ]]--
     if (text ~= nil) then
-        wrappedText:SetText(text)
+        wrappedText:set_text(text)
     end
 end
+
+ashita.events.register('unload', '__uiText_unload_cb', function ()
+    texts:destroy_interface();
+end)
 
 -- NOTE: z-ordering for texts works, but only relative to other texts. windower seems to always place texts above images!
 function uiText:createPrimitives()
     if not self.isEnabled or self.isCreated then return end
 
-    local textSettings = {
-        locked = true,
-    }
-    self.wrappedText = texts:new(textSettings)
-    self.wrappedText.draw_flags = bit.bor(FontDrawFlags.Outlined, FontDrawFlags.ManualRender);
-    self.wrappedText.right_justified = private[self].alignRight;
-    self.wrappedText.bold = true;
-    if (private[self].font ~= nil) then
-        self.wrappedText.font_family = private[self].font
-    else
-        self.wrappedText.font_family = 'Arial' -- Arial is the fallback font
-    end
-    setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
-    self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, private[self].color.r, private[self].color.g, private[self].color.b), 16);
-    self.wrappedText.color_outline = tonumber(string.format('%02x%02x%02x%02x', private[self].stroke.a, private[self].stroke.r, private[self].stroke.g, private[self].stroke.b), 16);
-    self.renderKey = sprites.textRenderInfo:length() .. tostring(self);
-    sprites.textRenderInfo[self.renderKey] = self.wrappedText;
+    local font_settings = {
+        box_height = 0,
+        box_width = 0,
+        font_alignment = private[self].alignRight and texts.Alignment.Right or texts.Alignment.Left;
+        font_color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, private[self].color.r, private[self].color.g, private[self].color.b), 16),
+        font_family = private[self].font or 'Arial',
+        font_flags = texts.FontFlags.Bold,
+        font_height = 12,
+        gradient_color = 0x00000000,
+        gradient_style = 0,
+        outline_color = tonumber(string.format('%02x%02x%02x%02x', private[self].stroke.a, private[self].stroke.r, private[self].stroke.g, private[self].stroke.b), 16),
+        outline_width = 3,
+    
+        position_x = 0,
+        position_y = 0,
+        text = private[self].text or '',
+    };
+    self.wrappedText = texts:create_object(font_settings, false)
+    --setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
     self.super:createPrimitives() -- this will call applyLayout()
 end
 
@@ -141,16 +145,17 @@ function uiText:applyLayout()
     local x = self.absolutePos.x
     local y = self.absolutePos.y
 
+    --[[
     if private[self].alignRight then
         -- right aligned text coordinates start at the right side of the screen
         x = x - AshitaCore:GetConfigurationManager():GetFloat('boot', 'ffxi.registry', '0001', 1024);
     end
-
-    self.wrappedText.position_x = x;
-    self.wrappedText.position_y = y
-    self.wrappedText:SetFontHeight(math.floor(private[self].fontSize * self.absoluteScale.y))
-    --self.wrappedText:stroke_width(private[self].strokeWidth * self.absoluteScale.x)
-    self.wrappedText.visible = self.absoluteVisibility
+    ]]--
+    self.wrappedText:set_position_x(x);
+    self.wrappedText:set_position_y(y);
+    self.wrappedText:set_font_height(math.floor(private[self].fontSize * self.absoluteScale.y) + 2) -- add 2 to account for diff between windows and ashita
+    self.wrappedText:set_outline_width(private[self].strokeWidth * self.absoluteScale.x)
+    self.wrappedText:set_visible(self.absoluteVisibility);
 end
 
 function uiText:update(text)
@@ -185,7 +190,7 @@ function uiText:color(r,g,b)
         private[self].color.b = b
 
         if self.isCreated then
-            self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, r, g, b), 16);
+            self.wrappedText:set_font_color(tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, r, g, b), 16));
         end
     end
 
@@ -202,7 +207,7 @@ function uiText:alpha(a)
 	    private[self].color.a = a
 
         if self.isCreated then
-            self.wrappedText.color = tonumber(string.format('%02x%02x%02x%02x', a, private[self].color.r, private[self].color.g, private[self].color.b), 16);
+            self.wrappedText:set_font_color(tonumber(string.format('%02x%02x%02x%02x', a, private[self].color.r, private[self].color.g, private[self].color.b), 16));
         end
     end
 end

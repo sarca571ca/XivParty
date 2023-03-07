@@ -27,7 +27,7 @@
 ]]
 
 -- windower library imports
-local images = require('sprites')
+local images = require('libs/sprites')
 
 -- imports
 local classes = require('classes')
