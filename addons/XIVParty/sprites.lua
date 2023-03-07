@@ -9,14 +9,18 @@ local d3d8_device = d3d8.get_device();
 
 local imageCache = {};
 
+local renderInfo = T{};
+
 local sprites = {};
 
-local function CreateSprite()
+local sprite = nil;
+
+local function create_sprite()
 	local sprite_ptr = ffi.new('ID3DXSprite*[1]');
 	if (ffi.C.D3DXCreateSprite(d3d8_device, sprite_ptr) ~= ffi.C.S_OK) then
 		error('failed to make sprite obj');
 	end
-	sprites.sprite = d3d8.gc_safe_release(ffi.cast('ID3DXSprite*', sprite_ptr[0]));
+	return d3d8.gc_safe_release(ffi.cast('ID3DXSprite*', sprite_ptr[0]));
 end	
 
 local function load_image_from_path(path)
@@ -60,8 +64,8 @@ end
 -- reset the icon cache and release all resources
 function sprites:SetPath(NewPath)
     self.texture, self.width, self.height = load_image_from_path(NewPath);
-	if (self.texture ~= nil and self.sprite == nil) then
-		CreateSprite();
+	if (self.texture ~= nil and sprite == nil) then
+		sprite = create_sprite();
 	end
 end
 
@@ -86,28 +90,8 @@ function sprites:ClearTexture()
 	self.width = nil;
 end
 
-function sprites:Render()
-
-	if (self.visible and self.texture ~= nil and self.sprite ~= nil) then
-
-		self.sprite:Begin();
-
-		-- collect our information for rendering
-		local color = d3d8.D3DCOLOR_ARGB(self.alpha, self.color[1], self.color[2], self.color[3]);
-		self.rect.right = self.width;
-		self.rect.bottom = self.height;
-		self.vec_position.x = self.position_x;
-		self.vec_position.y = self.position_y;
-		self.vec_scale.x = self.scale_x;
-		self.vec_scale.y = self.scale_y;
-		self.sprite:Draw(self.texture, self.rect, self.vec_scale, nil, 0.0, self.vec_position, color);
-
-		self.sprite:End();
-	end
-
-end
-
 function sprites:new()
+
 	local o = {};
     setmetatable(o, self);
     self.__index = self;
@@ -129,19 +113,37 @@ function sprites:new()
 	o.rect = ffi.new('RECT', { 0, 0, 32, 32, });
 	o.vec_position = ffi.new('D3DXVECTOR2', { 0, 0, });
 	o.vec_scale = ffi.new('D3DXVECTOR2', { 1.0, 1.0, });
-	o.sprite = nil;
-	o.d3dEvent = 'sprites'..tostring(o);
-	
-	ashita.events.register('d3d_present', o.d3dEvent, self.Render:bind1(o));
+	o.renderKey = renderInfo:length() + tostring(0);
+	renderInfo[o.renderKey] = o;
 
     return o;
 end
 
 function sprites:destroy()
-	print('fert');
-	if (self.d3dEvent ~= nil) then
-		ashita.events.unregister('d3d_present', self.d3dEvent);
-	end
+	renderInfo[self.renderKey] = nil;
 end
+
+-- Render everything that is in our renderinfo
+ashita.events.register('d3d_present', '__sprites_present_cb', function ()
+
+	for k,v in pairs(renderInfo) do
+		if (v.visible and v.texture ~= nil and sprite ~= nil) then
+
+			sprite:Begin();
+
+			-- collect our information for rendering
+			local color = d3d8.D3DCOLOR_ARGB(v.alpha, v.color[1], v.color[2], v.color[3]);
+			v.rect.right = v.width;
+			v.rect.bottom = v.height;
+			v.vec_position.x = v.position_x;
+			v.vec_position.y = v.position_y;
+			v.vec_scale.x = v.scale_x;
+			v.vec_scale.y = v.scale_y;
+			sprite:Draw(v.texture, v.rect, v.vec_scale, nil, 0.0, v.vec_position, color);
+
+			sprite:End();
+		end
+	end
+end);
 
 return sprites;
