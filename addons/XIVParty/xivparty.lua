@@ -34,6 +34,7 @@ addon.version = '2.1.1'
 gStatusLib = require('status.status');
 require('common')
 local socket = require('socket')
+local imgui = require('imgui')
 
 -- imports
 local const = require('const')
@@ -50,7 +51,7 @@ local lastFrameTimeMsec = 0
 local view = nil
 
 local setupModel = nil
-local isSetupEnabled = false
+local isSetupEnabled = { false };
 
 math.randomseed(os.time())
 
@@ -62,16 +63,16 @@ RefCountText = 0
 -- initialization / events
 local function setSetupEnabled(enabled)
 	if (not isInitialized) then return end;
-	isSetupEnabled = enabled
+	isSetupEnabled[1] = enabled
 
 	if not setupModel then
 		setupModel = model.new()
 		setupModel:createSetupData()
 	end
 
-	view:setModel(isSetupEnabled and setupModel or model) -- lua style ternary operator
+	view:setModel(isSetupEnabled[1] and setupModel or model) -- lua style ternary operator
 
-	view:setUiLocked(not isSetupEnabled)
+	view:setUiLocked(not isSetupEnabled[1])
 
 end
 
@@ -147,14 +148,17 @@ function setUiScale(scaleX, scaleY, partyIndex)
 	partySettings.scale = T{ scaleX, scaleY }
 end
 
-
-settingsLib.register('settings', 'settings_update', function (s)
+function UpdateSettings(s)
     if (s ~= nil) then
         Settings = s;
 		dispose();
 		init();
     end
-	settingsLib.Save();
+	settingsLib.save();
+end
+
+settingsLib.register('settings', 'settings_update', function (s)
+	UpdateSettings(s);
 end);
 
 
@@ -187,7 +191,7 @@ local function isSolo()
 	if (party == nil) then
 		return true
 	else
-		return not party:GetMemberIsActive(1);
+		return party:GetMemberIsActive(1) == 0;
 	end
 end
 
@@ -199,12 +203,77 @@ local function CheckState()
 	end
 end
 
+ashita.events.register('command', 'command_cb', function (e)
+	-- Parse the command arguments
+	local command_args = e.command:lower():args()
+    if table.contains({'/xivparty'}, command_args[1]) then
+		-- Toggle the config menu
+		setSetupEnabled(not isSetupEnabled[1]);
+		e.blocked = true;
+	end
+end);
+
+function DrawConfigMenu()
+	if(isSetupEnabled[1] and imgui.Begin(("XivParty Config"):fmt(addon.version), true, bit.bor(ImGuiWindowFlags_NoSavedSettings))) then
+
+		-- General
+		if (imgui.Checkbox('Hide Solo', { Settings.hideSolo })) then
+			Settings.hideSolo = not Settings.hideSolo;
+			UpdateSettings();
+		end
+		if (imgui.Checkbox('Hide Alliance', { Settings.hideAlliance })) then
+			Settings.hideAlliance = not Settings.hideAlliance;
+			UpdateSettings();
+		end
+		if (imgui.Checkbox('Hide During Cutscene', { Settings.hideCutscene })) then
+			Settings.hideCutscene = not Settings.hideCutscene;
+			UpdateSettings();
+		end
+		if (imgui.Checkbox('Mouse Targeting', { Settings.mouseTargeting })) then
+			Settings.mouseTargeting = not Settings.mouseTargeting;
+			UpdateSettings();
+		end
+		if (imgui.Checkbox('Swap Single Alliance', { Settings.swapSingleAlliance })) then
+			Settings.swapSingleAlliance = not Settings.swapSingleAlliance;
+			UpdateSettings();
+		end
+		if (imgui.Checkbox('Numeric Ranger', { Settings.rangeNumeric })) then
+			Settings.rangeNumeric = not Settings.rangeNumeric;
+			UpdateSettings();
+		end
+
+		-- buffs
+		local comboBoxItems = {};
+		comboBoxItems[0] = 'blacklist';
+		comboBoxItems[1] = 'whitelist';
+		if(imgui.BeginCombo('Buff Filter Mode', Settings.buffs.filterMode)) then
+			for i = 0,#comboBoxItems do
+				local is_selected = i == Settings.buffs.filterMode;
+
+				if (imgui.Selectable(comboBoxItems[i], is_selected) and Settings.buffs.filterMode~= i) then
+					Settings.buffs.filterMode = i;
+					UpdateSettings();
+				end
+				if(is_selected) then
+					imgui.SetItemDefaultFocus();
+				end
+			end
+			imgui.EndCombo();
+		end
+		if (imgui.Checkbox('Buff Custom Order', { Settings.buffs.customOrder })) then
+			Settings.buffs.customOrder = not Settings.buffs.customOrder;
+			UpdateSettings();
+		end
+	end
+	imgui.End();
+end
+
 -- per frame updating
 ashita.events.register('d3d_present', 'present_cb', function ()
 	CheckState();
 
 	if isZoning or not isInitialized then return end
-
+	DrawConfigMenu();
 	local timeMsec = socket.gettime() * 1000
 	if timeMsec - lastFrameTimeMsec < Settings.updateIntervalMsec then return end
 	lastFrameTimeMsec = timeMsec
@@ -212,20 +281,9 @@ ashita.events.register('d3d_present', 'present_cb', function ()
 --	Settings:update()
 	model:updatePlayers()
 
-	view:visible(isSetupEnabled or not Settings.hideSolo or not isSolo(), const.visSolo)
+	view:visible(isSetupEnabled[1] or not Settings.hideSolo or not isSolo(), const.visSolo)
 	view:update()
 end)
-
-ashita.events.register('command', 'command_cb', function (e)
-	-- Parse the command arguments
-	local command_args = e.command:lower():args()
-    if table.contains({'/xivparty'}, command_args[1]) then
-		-- Toggle the config menu
-		setSetupEnabled(not isSetupEnabled);
-		e.blocked = true;
-	end
-end);
-
 -- packets
 --[[
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
