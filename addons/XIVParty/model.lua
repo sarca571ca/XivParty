@@ -95,11 +95,7 @@ function model:GetMemberInformation(memIdx)
         memberInfo.targetIdx = party:GetMemberTargetIndex(memIdx);
         memberInfo.targeted = (t1 and t1 == memberInfo.targetIdx);
         memberInfo.subTargeted = (t2 and t2 == memberInfo.targetIdx);
-        if (memIdx == 0) then
-            memberInfo.buffs = player:GetBuffs();
-        else
-            memberInfo.buffs = gStatusLib.GetStatusIdsById(memberInfo.serverid);
-        end
+        memberInfo.buffs = gStatusLib.GetStatusIdsById(memberInfo.serverid);
         memberInfo.sync = bit.band(party:GetMemberFlagMask(memIdx), 0x100) == 0x100;
     else
         memberInfo.hp = 0;

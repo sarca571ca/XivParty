@@ -59,6 +59,7 @@ function player:init(name, id, model)
 	self.model = model
 end
 
+--[[
 -- merges data from other player into self
 function player:merge(other)
 	utils:print('Merging player ' .. utils:toString(other.name) .. '(' .. utils:toString(other.id) .. ')' ..
@@ -98,7 +99,7 @@ function player:merge(other)
 
 	return self
 end
-
+]]--
 function GetIsMobByIndex(index)
 	return (bit.band(AshitaCore:GetMemoryManager():GetEntity():GetSpawnFlags(index), 0x10) ~= 0);
 end

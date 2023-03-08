@@ -33,8 +33,6 @@ local function load_image_from_path(path)
 		return imageCache[path][1], imageCache[path][2], imageCache[path][3];
 	end
 
-    local supports_alpha = false;
-
     if (path == nil or path == '' or not ashita.fs.exists(path)) then
         return nil, 0, 0;
     end
@@ -43,17 +41,10 @@ local function load_image_from_path(path)
 	local imageInfo = ffi.new('D3DXIMAGE_INFO');
 
 	local returnImage = nil;
-    if (supports_alpha) then
-        -- use the native transaparency
-        if (ffi.C.D3DXCreateTextureFromFileA(d3d8_device, path, dx_texture_ptr) == ffi.C.S_OK) then
-            returnImage = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
-        end
-    else
-        -- use black as colour-key for transparency
-        if (ffi.C.D3DXCreateTextureFromFileExA(d3d8_device, path, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0, ffi.C.D3DFMT_A8R8G8B8, ffi.C.D3DPOOL_MANAGED, ffi.C.D3DX_DEFAULT, ffi.C.D3DX_DEFAULT, 0xFF000000, imageInfo, nil, dx_texture_ptr) == ffi.C.S_OK) then
-            returnImage = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
-        end
-    end
+	-- use black as colour-key for transparency
+	if (ffi.C.D3DXCreateTextureFromFileExA(d3d8_device, path, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0, ffi.C.D3DFMT_A8R8G8B8, ffi.C.D3DPOOL_MANAGED, ffi.C.D3DX_DEFAULT, ffi.C.D3DX_DEFAULT, 0xFF000000, imageInfo, nil, dx_texture_ptr) == ffi.C.S_OK) then
+		returnImage = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
+	end
 
 	-- cache our image and return if it's valid
 	if (returnImage ~= nil) then
@@ -113,7 +104,7 @@ function sprites:new()
 	o.rect = ffi.new('RECT', { 0, 0, 32, 32, });
 	o.vec_position = ffi.new('D3DXVECTOR2', { 0, 0, });
 	o.vec_scale = ffi.new('D3DXVECTOR2', { 1.0, 1.0, });
-	o.renderKey = renderInfo:length() + tostring(0);
+	o.renderKey = renderInfo:length() + 1;
 	renderInfo[o.renderKey] = o;
 
     return o;
@@ -127,7 +118,7 @@ end
 ashita.events.register('d3d_present', '__sprites_present_cb', function ()
 	if (sprite ~= nil) then
 		sprite:Begin();
-		for k,v in pairs(renderInfo) do
+		for _,v in pairs(renderInfo) do
 			if (v.visible and v.texture ~= nil) then
 
 				-- collect our information for rendering
@@ -138,7 +129,6 @@ ashita.events.register('d3d_present', '__sprites_present_cb', function ()
 				v.vec_scale.x = v.scale_x;
 				v.vec_scale.y = v.scale_y;
 				sprite:Draw(v.texture, v.rect, v.vec_scale, nil, 0.0, v.vec_position, v.color);
-
 
 			end
 		end

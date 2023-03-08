@@ -88,11 +88,12 @@ end
 function uiListItem:dispose()
 	if not self.isEnabled then return end
 
+	--[[
 	if self.mouseHandlerId then
 		windower.unregister_event(self.mouseHandlerId)
 		self.mouseHandlerId = nil
 	end
-
+	]]--
 	self.super:dispose()
 end
 
