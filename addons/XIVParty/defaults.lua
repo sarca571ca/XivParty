@@ -68,7 +68,7 @@ local defaults = {
 	},
 
 	buffs = {
-		filters = '', -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
+		filters = {}, -- table of buffs to filter
 		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
 		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
 	}

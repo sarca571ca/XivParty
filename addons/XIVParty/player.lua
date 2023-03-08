@@ -177,16 +177,15 @@ end
 
 function player:updateBuffs(buffs)
 	self.buffs = buffs -- list of all buffs this player has
-	self.filteredBuffs = buffs -- list of filtered buffs to be displayed
+	self.filteredBuffs = T{}; -- list of filtered buffs to be displayed
 
 	if not buffs then return end
 
-	--[[ TODO
 	for i = 1, const.maxBuffs do
 		local buff = buffs[i]
 
-		if (Settings.buffs.filterMode == 'blacklist' and Settings.buffFilters[buff]) or
-		   (Settings.buffs.filterMode == 'whitelist' and not Settings.buffFilters[buff]) then
+		if (Settings.buffs.filterMode == 'blacklist' and Settings.buffs.filters:contains(buff)) or
+		   (Settings.buffs.filterMode == 'whitelist' and not Settings.buffs.filters:contains(buff)) then
 			buff = nil
 		end
 
@@ -201,7 +200,7 @@ function player:updateBuffs(buffs)
 	else
 		self.filteredBuffs:sort()
 	end
-	]]--
+
 end
 
 function player:refreshFilteredBuffs()
@@ -214,6 +213,7 @@ function player:updateLeaderFromFlags(flags)
 	self.isQuarterMaster = utils:bitAnd(flags, 16) > 0
 end
 
+--[[
 function player:updateJobFromPacket(packet)
 	-- these can contain NON 0 / NON 0 when the party member is out of zone
 	-- seem to always get NON 0 / NON 0 if character has no SJ
@@ -233,6 +233,7 @@ function player:updateJobFromPacket(packet)
 		utils:print('Unusable job info. Dropping.', 0)
 	end
 end
+]]--
 
 function player:createSetupData(job, subJob, isMainParty)
 
