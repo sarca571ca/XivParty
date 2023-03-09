@@ -219,7 +219,7 @@ local function forceUpdateBuffs()
 end
 
 function DrawConfigMenu()
-	if(imgui.Begin(("XivParty Config"):fmt(addon.version), true, bit.bor(ImGuiWindowFlags_NoSavedSettings))) then
+	if(imgui.Begin(("XivParty Config"), true)) then
 
 		-- General
 		if (imgui.Checkbox('Hide Solo', { Settings.hideSolo })) then
@@ -259,6 +259,21 @@ function DrawConfigMenu()
 			end
 			imgui.EndCombo();
 		end
+
+		local inputString = {''};
+		for _,v in pairs(Settings.buffs.filters) do
+			inputString[1] = inputString[1]..v..',';
+		end
+		if imgui.InputText('Buff Filters', inputString, 999) then
+			local newFilter = T{};
+			for w in inputString[1]:gmatch("([^,]+)") do 
+				table.insert(newFilter,tonumber(w));
+			end
+			if (not table.equals(newFilter, Settings.buffs.filters)) then
+				Settings.buffs.filters = newFilter;
+				forceUpdateBuffs()
+			end
+		 end
 		if (imgui.Checkbox('Buff Custom Order', { Settings.buffs.customOrder })) then
 			Settings.buffs.customOrder = not Settings.buffs.customOrder;
 			forceUpdateBuffs()
