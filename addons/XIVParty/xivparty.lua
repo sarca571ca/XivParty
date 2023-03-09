@@ -77,15 +77,15 @@ local function setSetupEnabled(enabled)
 	if (not enabled) then
 		UpdateSettings();
 	else
-		print('XIVPARTY: Config opened (/xp or /xivparty)')
-		print('XIVPARTY: Retype the command to save and close')
-		print('XIVPARTY: To move party lists click and drag the grey boxes')
+		print(chat.header(addon.name)..'Config opened (/xp or /xivparty)')
+		print(chat.header(addon.name)..'Retype the command to save and close')
+		print(chat.header(addon.name)..'To move party lists click and drag the grey boxes')
 	end
 end
 
 local function init()
 	if not isInitialized then
-		print('XIVPARTY: -Initializing- Type /xp or /xivparty to open config')
+		print(chat.header(addon.name)..'-Initializing- Type /xp or /xivparty to open config')
 		view = uiView.new(model) -- depends on settings, always create view after loading settings
 		isInitialized = true
 	end
@@ -266,7 +266,7 @@ function DrawConfigMenu()
 
                     if (imgui.Selectable(layout_paths[i], is_selected) and layout_paths[i] ~= Settings.layout) then
                         Settings.layout = layout_paths[i];
-                        UpdateSettings();
+						view:reload()
                     end
 
                     if (is_selected) then
