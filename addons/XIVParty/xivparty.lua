@@ -196,11 +196,14 @@ local function isSolo()
 end
 
 local function CheckState()
+	-- Check for login state
 	if (gStatusLib.helpers.bLoggedIn) then
 		init();
 	else
 		dispose();
 	end
+
+	view:visible(not Settings.hideCutscene or not gStatusLib.helpers.GetGameInterfaceHidden(), const.visCutscene) -- hide UI during cutscenes
 end
 
 ashita.events.register('command', 'command_cb', function (e)
@@ -223,129 +226,70 @@ local function forceUpdateScales()
 	if (not isInitialized) then return; end
 	view:updatePartyScales();
 end
+
 function DrawConfigMenu()
 	if(imgui.Begin(("XivParty Config"), true)) then
 
+		-- Use tabs for this config menu
+		imgui.BeginTabBar('XivParty Settings Tabs');
+
 		-- General
-		if (imgui.Checkbox('Hide Solo', { Settings.hideSolo })) then
-			Settings.hideSolo = not Settings.hideSolo;
-		end
-		if (imgui.Checkbox('Hide Alliance', { Settings.hideAlliance })) then
-			Settings.hideAlliance = not Settings.hideAlliance;
-		end
-		if (imgui.Checkbox('Hide During Cutscene', { Settings.hideCutscene })) then
-			Settings.hideCutscene = not Settings.hideCutscene;
-		end
-		--[[
-		if (imgui.Checkbox('Mouse Targeting', { Settings.mouseTargeting })) then
-			Settings.mouseTargeting = not Settings.mouseTargeting;
-		end
-		]]--
-		if (imgui.Checkbox('Swap Single Alliance', { Settings.swapSingleAlliance })) then
-			Settings.swapSingleAlliance = not Settings.swapSingleAlliance;
-		end
-		if (imgui.Checkbox('Numeric Range', { Settings.rangeNumeric })) then
-			Settings.rangeNumeric = not Settings.rangeNumeric;
+		if imgui.BeginTabItem('Debug') then
+
+			if (imgui.Checkbox('Hide Solo', { Settings.hideSolo })) then
+				Settings.hideSolo = not Settings.hideSolo;
+			end
+			imgui.ShowHelp('hides the party list when you are not in a party');
+
+			if (imgui.Checkbox('Hide Alliance', { Settings.hideAlliance })) then
+				Settings.hideAlliance = not Settings.hideAlliance;
+			end
+			imgui.ShowHelp('hides UI for alliance parties');
+
+			if (imgui.Checkbox('Hide During Cutscene', { Settings.hideCutscene })) then
+				Settings.hideCutscene = not Settings.hideCutscene;
+			end
+			imgui.ShowHelp('hides UI during cutscenes, when talking to NPCs, and when the map is open');
+
+			if (imgui.Checkbox('Swap Single Alliance', { Settings.swapSingleAlliance })) then
+				Settings.swapSingleAlliance = not Settings.swapSingleAlliance;
+			end
+			imgui.ShowHelp('when only one alliance party exists, show the members in the 2nd alliance list');
+
+			if (imgui.Checkbox('Numeric Range', { Settings.rangeNumeric })) then
+				Settings.rangeNumeric = not Settings.rangeNumeric;
+			end
+			imgui.ShowHelp('enables numeric display of party member distances');
+
+			local rangeString = {Settings.rangeIndicator};
+			if imgui.InputInt('Range Indicator', rangeString) then
+				if (rangeString[1] ~= nil) then
+					Settings.rangeIndicator = rangeString[1];
+				end
+			end
+			imgui.ShowHelp('if party members are closer than this distance, they will be marked. 0 = off');
+
+			local rangeFarString = {Settings.rangeIndicatorFar};
+			if imgui.InputInt('Range Indicator Far', rangeFarString) then
+				if (rangeFarString[1] ~= nil) then
+					Settings.rangeIndicatorFar = rangeFarString[1];
+				end
+			end
+			imgui.ShowHelp('a second distance for range indication, further away, displaying a hollow icon. 0 = off');
+
+			local updateString = {Settings.updateIntervalMsec};
+			if imgui.InputInt('Update Interval (msec)', updateString) then
+				if (updateString[1] ~= nil) then
+					Settings.updateIntervalMsec = updateString[1];
+				end
+			end
+			imgui.ShowHelp('the UI update interval in milliseconds, changing this will affect animation speeds and general performance');
+
+			imgui.EndTabItem();
 		end
 
-		local rangeString = {tostring(Settings.rangeIndicator)};
-		if imgui.InputText('Range Indicator', rangeString, 999) then
-			Settings.rangeIndicator = tonumber(rangeString[1]);
-		end
-		local rangeFarString = {tostring(Settings.rangeIndicatorFar)};
-		if imgui.InputText('Range Indicator Far', rangeFarString, 999) then
-			Settings.rangeIndicatorFar = tonumber(rangeFarString[1]);
-		end
-		local updateString = {tostring(Settings.updateIntervalMsec)};
-		if imgui.InputText('Update Interval (msec)', updateString, 999) then
-			Settings.updateIntervalMsec = tonumber(updateString[1]);
-		end
-
-		-- Party Settings
-		if (imgui.CollapsingHeader("Party")) then
-			local partyCustomScaling = { Settings.party.scale[1] ~= 0 };
-			if (imgui.Checkbox('Party Custom Scaling', partyCustomScaling)) then
-				if (partyCustomScaling[1]) then
-					Settings.party.scale = T{1,1};
-				else
-					Settings.party.scale = T{0,0};
-				end
-				forceUpdateScales();
-			end
-			if (partyCustomScaling[1]) then
-				local partyScale = { Settings.party.scale[1] };
-				if (imgui.SliderFloat('Party Scale', partyScale, 0.25, 2.5, '%.2f')) then
-					Settings.party.scale[1] = partyScale[1];
-					Settings.party.scale[2] = partyScale[1];
-					forceUpdateScales();
-				end
-			end
-		end
-
-		-- Alliance 1 Settings
-		if (imgui.CollapsingHeader("Alliance 1")) then
-			local alOneCustomScaling = { Settings.alliance1.scale[1] ~= 0 };
-			if (imgui.Checkbox('Al1 Custom Scaling', alOneCustomScaling)) then
-				if (alOneCustomScaling[1]) then
-					Settings.alliance1.scale = T{1,1};
-				else
-					Settings.alliance1.scale = T{0,0};
-				end
-				forceUpdateScales();
-			end
-			if (alOneCustomScaling[1]) then
-				local al1Scale = { Settings.alliance1.scale[1] };
-				if (imgui.SliderFloat('Al1 Scale', al1Scale, 0.25, 2.5, '%.2f')) then
-					Settings.alliance1.scale[1] = al1Scale[1];
-					Settings.alliance1.scale[2] = al1Scale[1];
-					forceUpdateScales();
-				end
-			end
-		end
-
-		-- Alliance 2 Settings
-		if (imgui.CollapsingHeader("Alliance 2")) then
-			local al2CustomScaling = { Settings.alliance2.scale[1] ~= 0 };
-			if (imgui.Checkbox('Al2 Custom Scaling', al2CustomScaling)) then
-				if (al2CustomScaling[1]) then
-					Settings.alliance2.scale = T{1,1};
-				else
-					Settings.alliance2.scale = T{0,0};
-				end
-				forceUpdateScales();
-			end
-			if (al2CustomScaling[1]) then
-				local al2Scale = { Settings.alliance2.scale[1] };
-				if (imgui.SliderFloat('Al2 Scale', al2Scale, 0.25, 2.5, '%.2f')) then
-					Settings.alliance2.scale[1] = al2Scale[1];
-					Settings.alliance2.scale[2] = al2Scale[1];
-					forceUpdateScales();
-				end
-			end
-		end
-
-		--[[
-		party = {
-			scale = T{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
-			itemSpacing = 0, -- distance between party list items
-			alignBottom = false, -- expands the party list from bottom to top
-			showEmptyRows = false -- show empty rows in partially full parties
-		},
-		alliance1 = {
-			scale = T{ 0, 0 },
-			itemSpacing = 0,
-			alignBottom = false,
-			showEmptyRows = false
-		},
-		alliance2 = {
-			scale = T{ 0, 0 },
-			itemSpacing = 0,
-			alignBottom = false,
-			showEmptyRows = false
-		},
-		]]--
 		-- buffs
-		if (imgui.CollapsingHeader("Buffs")) then
+		if (imgui.BeginTabItem("Buffs")) then
 			local comboBoxItems = {};
 			comboBoxItems[0] = 'blacklist';
 			comboBoxItems[1] = 'whitelist';
@@ -363,6 +307,7 @@ function DrawConfigMenu()
 				end
 				imgui.EndCombo();
 			end
+			imgui.ShowHelp('blacklist or whitelist, both use the same filter list');
 
 			local filterString = {''};
 			for _,v in pairs(Settings.buffs.filters) do
@@ -378,11 +323,126 @@ function DrawConfigMenu()
 					forceUpdateBuffs()
 				end
 			end
+			imgui.ShowHelp('table of buffs to filter');
+
 			if (imgui.Checkbox('Buff Custom Order', { Settings.buffs.customOrder })) then
 				Settings.buffs.customOrder = not Settings.buffs.customOrder;
 				forceUpdateBuffs()
 			end
+			imgui.ShowHelp('sort buffs by a custom order defined in buffOrder.lua');
+
+			imgui.EndTabItem();
 		end
+
+		-- Party Settings
+		if (imgui.BeginTabItem("Party")) then
+			local partyCustomScaling = { Settings.party.scale[1] ~= 0 };
+			if (imgui.Checkbox('Party: Custom Scaling', partyCustomScaling)) then
+				if (partyCustomScaling[1]) then
+					Settings.party.scale = T{1,1};
+				else
+					Settings.party.scale = T{0,0};
+				end
+				forceUpdateScales();
+			end
+
+			if (partyCustomScaling[1]) then
+				local partyScale = { Settings.party.scale[1] };
+				if (imgui.SliderFloat('Party: Scale', partyScale, 0.25, 2.5, '%.2f')) then
+					Settings.party.scale[1] = partyScale[1];
+					Settings.party.scale[2] = partyScale[1];
+					forceUpdateScales();
+				end
+			end
+
+			if (imgui.Checkbox('Party: Align Bottom', { Settings.party.alignBottom })) then
+				Settings.party.alignBottom = not Settings.party.alignBottom;
+			end
+
+			if (imgui.Checkbox('Party: Show Empty Rows', { Settings.party.showEmptyRows })) then
+				Settings.party.showEmptyRows = not Settings.party.showEmptyRows;
+			end
+
+			local partySpacing = { Settings.party.itemSpacing };
+			if (imgui.SliderInt('Party: Entry Spacing', partySpacing, 0, 100)) then
+				Settings.party.itemSpacing = partySpacing[1];
+				view:setUiLocked(not isSetupEnabled[1])
+			end
+
+			imgui.EndTabItem();
+		end
+
+		-- Alliance 1 Settings
+		if (imgui.BeginTabItem("Alliance 1")) then
+			local alOneCustomScaling = { Settings.alliance1.scale[1] ~= 0 };
+			if (imgui.Checkbox('Al1: Custom Scaling', alOneCustomScaling)) then
+				if (alOneCustomScaling[1]) then
+					Settings.alliance1.scale = T{1,1};
+				else
+					Settings.alliance1.scale = T{0,0};
+				end
+				forceUpdateScales();
+			end
+
+			if (alOneCustomScaling[1]) then
+				local al1Scale = { Settings.alliance1.scale[1] };
+				if (imgui.SliderFloat('Al1: Scale', al1Scale, 0.25, 2.5, '%.2f')) then
+					Settings.alliance1.scale[1] = al1Scale[1];
+					Settings.alliance1.scale[2] = al1Scale[1];
+					forceUpdateScales();
+				end
+			end
+
+			if (imgui.Checkbox('Al1: Align Bottom', { Settings.alliance1.alignBottom })) then
+				Settings.alliance1.alignBottom = not Settings.alliance1.alignBottom;
+			end
+
+			if (imgui.Checkbox('Al1: Show Empty Rows', { Settings.alliance1.showEmptyRows })) then
+				Settings.alliance1.showEmptyRows = not Settings.alliance1.showEmptyRows;
+			end
+
+			local allianceOneSpacing = { Settings.alliance1.itemSpacing };
+			if (imgui.SliderInt('Al1: Entry Spacing', allianceOneSpacing, 0, 100)) then
+				Settings.alliance1.itemSpacing = allianceOneSpacing[1];
+				view:setUiLocked(not isSetupEnabled[1])
+			end
+
+			imgui.EndTabItem();
+		end
+
+		-- Alliance 2 Settings
+		if (imgui.BeginTabItem("Alliance 2")) then
+			local al2CustomScaling = { Settings.alliance2.scale[1] ~= 0 };
+			if (imgui.Checkbox('Al2: Custom Scaling', al2CustomScaling)) then
+				if (al2CustomScaling[1]) then
+					Settings.alliance2.scale = T{1,1};
+				else
+					Settings.alliance2.scale = T{0,0};
+				end
+				forceUpdateScales();
+			end
+			if (al2CustomScaling[1]) then
+				local al2Scale = { Settings.alliance2.scale[1] };
+				if (imgui.SliderFloat('Al2: Scale', al2Scale, 0.25, 2.5, '%.2f')) then
+					Settings.alliance2.scale[1] = al2Scale[1];
+					Settings.alliance2.scale[2] = al2Scale[1];
+					forceUpdateScales();
+				end
+			end
+			if (imgui.Checkbox('Al2: Align Bottom', { Settings.alliance2.alignBottom })) then
+				Settings.alliance2.alignBottom = not Settings.alliance2.alignBottom;
+			end
+			if (imgui.Checkbox('Al2: Show Empty Rows', { Settings.alliance2.showEmptyRows })) then
+				Settings.alliance2.showEmptyRows = not Settings.alliance2.showEmptyRows;
+			end
+			local allianceTwoSpacing = { Settings.alliance2.itemSpacing };
+			if (imgui.SliderInt('Al2: Entry Spacing', allianceTwoSpacing, 0, 100)) then
+				Settings.alliance2.itemSpacing = allianceTwoSpacing[1];
+				view:setUiLocked(not isSetupEnabled[1])
+			end
+			imgui.EndTabItem();
+		end
+		imgui.EndTabBar();
 		imgui.End();
 	end
 

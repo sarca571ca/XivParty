@@ -208,7 +208,7 @@ function uiPartyList:update()
 	-- bottom alignment
 	local alignBottomAdjustY = 0
 	if partySettings.alignBottom then
-		alignBottomAdjustY = -rowCount * self.layout.rowHeight
+		alignBottomAdjustY = contentHeight * -1;
 	end
 
 	self.background:pos(self.bgPos.x, self.bgPos.y + alignBottomAdjustY)
