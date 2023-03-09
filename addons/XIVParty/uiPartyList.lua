@@ -243,7 +243,6 @@ function uiPartyList:scaleFromSettings()
 	if newScale.x == 0 and newScale.y == 0 then
 		newScale.x = utils:round(resY / const.baseResY, 2)
 		newScale.y = newScale.x
-		print('Auto Detect UI scale: ' .. newScale.x)
 	end
 	self:scale(newScale.x, newScale.y);
 end
