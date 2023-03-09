@@ -22,6 +22,8 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 ## Commands
 Commands were replaced with a simple config menu made in imgui. Simply type "/xivparty" or "/xp" to open the new config menu and access all the options!
 
+![ConfigScreenshot](https://user-images.githubusercontent.com/7691562/223948836-83ad1f9f-0362-495e-a12e-1370d1109809.png)
+
 ## Range Indication
 The distance to party members is indicated by dimming their HP bars in two stages: out of standard casting range (~20.8) and out of targeting range (50).
 
