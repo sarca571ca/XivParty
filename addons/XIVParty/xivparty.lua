@@ -76,11 +76,16 @@ local function setSetupEnabled(enabled)
 
 	if (not enabled) then
 		UpdateSettings();
+	else
+		print('XIVPARTY: Config opened (/xp or /xivparty)')
+		print('XIVPARTY: Retype the command to save and close')
+		print('XIVPARTY: To move party lists click and drag the grey boxes')
 	end
 end
 
 local function init()
 	if not isInitialized then
+		print('XIVPARTY: -Initializing- Type /xp or /xivparty to open config')
 		view = uiView.new(model) -- depends on settings, always create view after loading settings
 		isInitialized = true
 	end
