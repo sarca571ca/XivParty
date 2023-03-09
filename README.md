@@ -61,13 +61,13 @@ In addition, primitives also have the following parameters.
 Image parameters:  
 > - **path**: Path to the image file, relative to the addon's directory.  
 > - **size**: Width and height of the image (comma separated, float). This should be set to the original image's size in pixels, but can have different values to scale the image (in addition to the scale parameter).  
-> - **color**: Image color as a hexadecimal color code in the format #AARRGGBB (alpha, red, green, blue). Should be set to white (#FFFFFFFF) to preserve the original image file colors.  
+> - **color**: Image color as a hexadecimal color code in the format #RRGGBBAA (red, green, blue, alpha). Should be set to white (#FFFFFFFF) to preserve the original image file colors.  
 
 Text parameters:  
 > - **font**: Font name to be used for the text. Can be any system installed font. When the specified font is not found, "Arial" is used as a fallback.  
 > - **size**: Vertical font size in pixels, subject to scale.  
-> - **color**: Font's fill color as a hexadecimal color code in the format #AARRGGBB.  
-> - **stroke**: Stroke (outline) color as a hexadecimal color code in the format #AARRGGBB.  
+> - **color**: Font's fill color as a hexadecimal color code in the format #RRGGBBAA.  
+> - **stroke**: Stroke (outline) color as a hexadecimal color code in the format #RRGGBBAA.  
 > - **strokeWidth**: With of the outline in pixels, subject to scale.  
 > - **alignRight**: Set to true to make the text right-justified instead of the default left. This will change the position origin to top-right.  
 > - **maxChars**: Maximum number of characters to display. Longer texts will be cut off by replacing the last allowed character with an ellipsis (three dots). Set to 0 to allow unlimited characters.  
