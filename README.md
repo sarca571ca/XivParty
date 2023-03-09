@@ -118,7 +118,7 @@ Parameters:
 > - **colors**: List of background colors for each job role.
 
 ## Acknowledgments
-* Tylas11 (XivPart) for the original Windower addon XivParty
+* Tylas11 (XivParty) for the original Windower addon XivParty
 * Thorny (Ashita) for tons of help and the font renderer
 * SirEdeonX (xivbar) - early prototype based on xivbar's code
 * KenshiDRK (partybuffs) - buff icons
