@@ -159,6 +159,12 @@ function uiView:setUiLocked(isUiLocked)
 	end
 end
 
+function uiView:drawDragConfig()
+	for i = 0, self.lastPartyIndex do
+		self.partyLists[i]:drawDragConfig();
+	end
+end
+
 function uiView:debugSaveLayout()
 	if not self.isEnabled then return end
 

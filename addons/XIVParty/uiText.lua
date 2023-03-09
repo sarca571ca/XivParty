@@ -97,13 +97,14 @@ function uiText:dispose()
 end
 
 local function setTrimmedText(wrappedText, text, maxChars)
-    --[[ TODO
+
     if text and maxChars > 0 then
         if #text > maxChars then
+
             text = text:slice(1, math.max(1, maxChars - 1)) .. '...'
         end
     end
-    ]]--
+
     if (text ~= nil) then
         wrappedText:set_text(text)
     end

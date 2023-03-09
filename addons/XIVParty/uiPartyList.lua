@@ -34,6 +34,7 @@ local uiListItem = require('uiListItem')
 local uiImage = require('uiImage')
 local const = require('const')
 local utils = require('utils')
+local imgui = require('imgui')
 
 -- create the class
 local uiPartyList = classes.class(uiContainer)
@@ -143,6 +144,19 @@ function uiPartyList:setUiLocked(isUiLocked)
 	end
 end
 
+function uiPartyList:drawDragConfig()
+	if (not self.isUiLocked) then
+		imgui.SetNextWindowPos({self.posX, self.posY});
+		self.isUiLocked = true;
+	end
+	imgui.Begin(("XivParty: Move Party %s"):fmt(self.partyIndex), true, bit.bor(ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoDecoration))
+	local posX, posY = imgui.GetWindowPos();
+	self:pos(posX, posY)
+	setUiPosition(posX, posY, self.partyIndex)
+	imgui.End();
+end
+
+
 function uiPartyList:update()
 	if not self.isEnabled then return end
 
@@ -210,6 +224,7 @@ function uiPartyList:update()
 			item:pos(x, y + alignBottomAdjustY)
 		end
 	end
+
 
 	self.super:update()
 end

@@ -27,9 +27,6 @@
 ]]
 
 -- windower library imports
-local config = require('config')
-require('strings')
-
 -- imports
 local classes = require('classes')
 local defaults = require('defaults')

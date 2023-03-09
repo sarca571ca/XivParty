@@ -74,6 +74,9 @@ local function setSetupEnabled(enabled)
 
 	view:setUiLocked(not isSetupEnabled[1])
 
+	if (not enabled) then
+		UpdateSettings();
+	end
 end
 
 local function init()
@@ -115,7 +118,6 @@ end
 -- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
 function getUiPosition(partyIndex)
 	local partySettings = getPartySettings(partyIndex)
-
 	local pos = utils:coord(partySettings.pos)
 	return { x = utils:round(pos.x * resX), y = utils:round(pos.y * resY) }
 end
@@ -126,8 +128,8 @@ end
 -- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
 function setUiPosition(posX, posY, partyIndex)
 	local partySettings = getPartySettings(partyIndex)
-
-	partySettings.pos = T{ posX / resX, posY / resY }
+	local newPos = T{ posX / resX, posY / resY };
+	partySettings.pos = newPos;
 end
 
 -- gets the UI scale
@@ -144,8 +146,8 @@ end
 -- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
 function setUiScale(scaleX, scaleY, partyIndex)
 	local partySettings = getPartySettings(partyIndex)
-
-	partySettings.scale = T{ scaleX, scaleY }
+	local newUiScale = T{ scaleX, scaleY };
+	partySettings.scale = newUiScale;
 end
 
 function UpdateSettings(s)
@@ -160,8 +162,6 @@ end
 settingsLib.register('settings', 'settings_update', function (s)
 	UpdateSettings(s);
 end);
-
-
 
 --[[
 windower.register_event('load', function()
@@ -213,33 +213,32 @@ ashita.events.register('command', 'command_cb', function (e)
 	end
 end);
 
+local function forceUpdateBuffs()
+	if setupModel then setupModel:refreshFilteredBuffs() end
+	model:refreshFilteredBuffs()
+end
+
 function DrawConfigMenu()
-	if(isSetupEnabled[1] and imgui.Begin(("XivParty Config"):fmt(addon.version), true, bit.bor(ImGuiWindowFlags_NoSavedSettings))) then
+	if(imgui.Begin(("XivParty Config"):fmt(addon.version), true, bit.bor(ImGuiWindowFlags_NoSavedSettings))) then
 
 		-- General
 		if (imgui.Checkbox('Hide Solo', { Settings.hideSolo })) then
 			Settings.hideSolo = not Settings.hideSolo;
-			UpdateSettings();
 		end
 		if (imgui.Checkbox('Hide Alliance', { Settings.hideAlliance })) then
 			Settings.hideAlliance = not Settings.hideAlliance;
-			UpdateSettings();
 		end
 		if (imgui.Checkbox('Hide During Cutscene', { Settings.hideCutscene })) then
 			Settings.hideCutscene = not Settings.hideCutscene;
-			UpdateSettings();
 		end
 		if (imgui.Checkbox('Mouse Targeting', { Settings.mouseTargeting })) then
 			Settings.mouseTargeting = not Settings.mouseTargeting;
-			UpdateSettings();
 		end
 		if (imgui.Checkbox('Swap Single Alliance', { Settings.swapSingleAlliance })) then
 			Settings.swapSingleAlliance = not Settings.swapSingleAlliance;
-			UpdateSettings();
 		end
-		if (imgui.Checkbox('Numeric Ranger', { Settings.rangeNumeric })) then
+		if (imgui.Checkbox('Numeric Range', { Settings.rangeNumeric })) then
 			Settings.rangeNumeric = not Settings.rangeNumeric;
-			UpdateSettings();
 		end
 
 		-- buffs
@@ -251,8 +250,8 @@ function DrawConfigMenu()
 				local is_selected = i == Settings.buffs.filterMode;
 
 				if (imgui.Selectable(comboBoxItems[i], is_selected) and Settings.buffs.filterMode~= i) then
-					Settings.buffs.filterMode = i;
-					UpdateSettings();
+					Settings.buffs.filterMode = comboBoxItems[i];
+					forceUpdateBuffs();
 				end
 				if(is_selected) then
 					imgui.SetItemDefaultFocus();
@@ -262,10 +261,12 @@ function DrawConfigMenu()
 		end
 		if (imgui.Checkbox('Buff Custom Order', { Settings.buffs.customOrder })) then
 			Settings.buffs.customOrder = not Settings.buffs.customOrder;
-			UpdateSettings();
+			forceUpdateBuffs()
 		end
 	end
 	imgui.End();
+
+	view:drawDragConfig();
 end
 
 -- per frame updating
@@ -273,7 +274,11 @@ ashita.events.register('d3d_present', 'present_cb', function ()
 	CheckState();
 
 	if isZoning or not isInitialized then return end
-	DrawConfigMenu();
+
+	if (isSetupEnabled[1]) then
+		DrawConfigMenu();
+	end
+
 	local timeMsec = socket.gettime() * 1000
 	if timeMsec - lastFrameTimeMsec < Settings.updateIntervalMsec then return end
 	lastFrameTimeMsec = timeMsec
