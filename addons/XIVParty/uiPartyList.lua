@@ -53,11 +53,10 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		self.listItems = T{} -- ordered list by party list position, index range 0..5
 
 		local scale = getUiScale(self.partyIndex)
-		print(self.partyIndex);
 		local pos = getUiPosition(self.partyIndex)
 
 		local saveSettings = false
-		local isMainParty = partyIndex == 0
+		--local isMainParty = partyIndex == 0
 
 		-- initialize the UI scale based on the screen resolution
 		if scale.x == 0 and scale.y == 0 then

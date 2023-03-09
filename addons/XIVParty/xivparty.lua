@@ -227,6 +227,23 @@ local function forceUpdateScales()
 	view:updatePartyScales();
 end
 
+-- find all our layouts and strip _alliance and file extensions
+---@return table theme_paths
+local function get_layout_paths()
+    local path = ('%s\\addons\\%s\\layouts\\'):fmt(AshitaCore:GetInstallPath(), 'XivParty');
+    local directories = ashita.fs.get_dir(path, '.*.lua', true);
+    if (directories == nil) then
+        return T{};
+    end
+	local returnDirectories = T{};
+	for _,v in pairs(directories) do
+		if (not string.find(v, '_alliance')) then
+			table.insert(returnDirectories, v:match("(.+)%..+$"));
+		end
+	end
+	return returnDirectories;
+end 
+
 function DrawConfigMenu()
 	if(imgui.Begin(("XivParty Config"), true)) then
 
@@ -234,7 +251,26 @@ function DrawConfigMenu()
 		imgui.BeginTabBar('XivParty Settings Tabs');
 
 		-- General
-		if imgui.BeginTabItem('Debug') then
+		if imgui.BeginTabItem('General') then
+
+            -- Layout
+            local layout_paths = get_layout_paths();
+            if (imgui.BeginCombo('Layout', Settings.layout)) then
+                for i = 1,#layout_paths,1 do
+                    local is_selected = i == Settings.layout;
+
+                    if (imgui.Selectable(layout_paths[i], is_selected) and layout_paths[i] ~= Settings.layout) then
+                        Settings.layout = layout_paths[i];
+                        UpdateSettings();
+                    end
+
+                    if (is_selected) then
+                        imgui.SetItemDefaultFocus();
+                    end
+                end
+                imgui.EndCombo();
+            end
+            imgui.ShowHelp('active UI layout, found in XivParty/layouts directory'); 
 
 			if (imgui.Checkbox('Hide Solo', { Settings.hideSolo })) then
 				Settings.hideSolo = not Settings.hideSolo;
