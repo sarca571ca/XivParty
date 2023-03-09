@@ -1,7 +1,7 @@
 # XivParty [Ported and Updated by Tirem]
 A party list addon originally for Windower4 that I updated and ported to Ashita v4 <3
 
-Original Windower addon by Tylas11 [https://github.com/Tylas11/XivParty]
+Original Windower4 addon by Tylas11 [https://github.com/Tylas11/XivParty]
 
 ## Show Your Support ##
 If you would like to show your support for my addon creation and porting consider buying me a coffee! 
@@ -17,7 +17,7 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 ## Installation
 * Load using "/addon load xivparty" in the chat window
 * To load the addon automatically when the game starts, edit scripts/default.txt and add "/addon load xivparty" at the end
-* RECOMMENDED: Download and install the free font "[Grammara](https://www.fontspace.com/grammara-font-f4454)" for a more authentic FF14 look of the numbers (restart Windower afterwards, or it won't find the newly installed font)
+* RECOMMENDED: Download and install the free font "[Grammara](https://www.fontspace.com/grammara-font-f4454)" for a more authentic FF14 look of the numbers (restart Ashita afterwards, or it won't find the newly installed font)
 
 ## Commands
 Commands were replaced with a simple config menu made in imgui. Simply type "/xivparty" or "/xp" to open the new config menu and access all the options!
@@ -51,7 +51,7 @@ All UI elements support the following parameters:
 > - **enabled**: When set to false, the UI element and all its children will not be displayed. This also disables background updating to save resources. Alternatively, remove the whole XML node of an element to disable it.  
 > - **pos**: X and Y position (comma separated, float), relative to the parent element.  
 > - **scale**: Horizontal and vertical scale (comma separated, float), relative to the parent element.  
-> - **zOrder**: Sets the ordering of elements in the context of their parent (integer). Low values will place elements below ones with higher values. Due to a Windower limitation, z-order for images and texts are handled separately. This means that texts will always be above images, but elements of the same type can be ordered using this parameter. -WIP-  
+> - **zOrder**: Sets the ordering of elements in the context of their parent (integer). Low values will place elements below ones with higher values. Due to things are rendered, z-order for images and texts are handled separately. This means that texts will always be above images, but elements of the same type can be ordered using this parameter. -WIP-  
 > - **snapToRaster**: When true, the screen coordinates of the element will be rounded down to align with the pixels on the screen. This can help images and fonts to appear less blurry when scaled. However, since the positions are slightly changed while scaling, gaps can appear when an element is made up of multiple aligned images. For stacked elements like HP bars, it is recommended to make all image assets of the same size to prevent such alignment issues.  
 
 In addition, primitives also have the following parameters.
