@@ -1,7 +1,7 @@
 # XivParty [Ported and modified by Tirem]
 A party list addon originally for Windower that I ported to Ashita v4 <3
 
-Original Windower addon link [https://github.com/Tylas11/XivParty]
+Original Windower addon by Tylas11 [https://github.com/Tylas11/XivParty]
 
 ## Show Your Support ##
 If you would like to show your support for my addon creation and porting consider buying me a coffee! 
