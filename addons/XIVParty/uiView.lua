@@ -174,4 +174,12 @@ function uiView:debugSaveLayout()
 	print('Layout saved.')
 end
 
+function uiView:updatePartyScales()
+	if not self.isEnabled then return end
+
+	for i = 0, self.lastPartyIndex do
+		self.partyLists[i]:scaleFromSettings()
+	end
+end
+
 return uiView

@@ -53,6 +53,7 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		self.listItems = T{} -- ordered list by party list position, index range 0..5
 
 		local scale = getUiScale(self.partyIndex)
+		print(self.partyIndex);
 		local pos = getUiPosition(self.partyIndex)
 
 		local saveSettings = false
@@ -63,12 +64,14 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 			scale.x = utils:round(resY / const.baseResY, 2)
 			scale.y = scale.x
 
+			--[[
 			if isMainParty then
 				print('Initializing UI scale: ' .. scale.x)
-				print('Type "//xp setup" to change UI position and scale using drag & drop and the mouse wheel.')
+				print('Type "//xp" to change UI position and scale using drag & drop and the mouse wheel.')
 			end
+			]]--
 
-			setUiScale(scale.x, scale.y, self.partyIndex)
+			--setUiScale(scale.x, scale.y, self.partyIndex)
 			saveSettings = true
 		end
 
@@ -139,7 +142,7 @@ function uiPartyList:setUiLocked(isUiLocked)
 	if not self.isEnabled then return end
 
 	self.isUiLocked = isUiLocked
-	for k,item in pairs(self.listItems) do
+	for _,item in pairs(self.listItems) do
 		item:setUiLocked(isUiLocked)
 	end
 end
@@ -235,6 +238,18 @@ function uiPartyList:handleWindowerKeyboard(key, down)
     end
 end
 
+function uiPartyList:scaleFromSettings()
+	local newScale = getUiScale(self.partyIndex)
+	-- initialize the UI scale based on the screen resolution
+	if newScale.x == 0 and newScale.y == 0 then
+		newScale.x = utils:round(resY / const.baseResY, 2)
+		newScale.y = newScale.x
+		print('Auto Detect UI scale: ' .. newScale.x)
+	end
+	self:scale(newScale.x, newScale.y);
+end
+
+--[[
 -- handle mouse interaction
 function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
     if blocked then return end
@@ -295,5 +310,5 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
 
     return false
 end
-
+]]--
 return uiPartyList

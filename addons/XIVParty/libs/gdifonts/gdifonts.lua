@@ -61,15 +61,17 @@ local function render_objects()
         for _,obj in ipairs(objects) do
             if (obj.settings.visible) then
                 local texture, rect = obj:get_texture();
-                if (obj.settings.font_alignment == 1) then
-                    vec_position.x = obj.settings.position_x - (rect.right / 2);
-                elseif (obj.settings.font_alignment == 2) then
-                    vec_position.x = obj.settings.position_x - rect.right;
-                else
-                    vec_position.x = obj.settings.position_x;
+                if (texture ~= nil and rect ~= nil) then
+                    if (obj.settings.font_alignment == 1) then
+                        vec_position.x = obj.settings.position_x - (rect.right / 2);
+                    elseif (obj.settings.font_alignment == 2) then
+                        vec_position.x = obj.settings.position_x - rect.right;
+                    else
+                        vec_position.x = obj.settings.position_x;
+                    end
+                    vec_position.y = obj.settings.position_y;
+                    sprite:Draw(texture, rect, vec_scale, nil, 0.0, vec_position, d3dwhite);
                 end
-                vec_position.y = obj.settings.position_y;
-                sprite:Draw(texture, rect, vec_scale, nil, 0.0, vec_position, d3dwhite);
             end
         end
         sprite:End();

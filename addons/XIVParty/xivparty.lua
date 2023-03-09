@@ -206,7 +206,7 @@ end
 ashita.events.register('command', 'command_cb', function (e)
 	-- Parse the command arguments
 	local command_args = e.command:lower():args()
-    if table.contains({'/xivparty'}, command_args[1]) then
+    if table.contains({'/xivparty', '/xp'}, command_args[1]) then
 		-- Toggle the config menu
 		setSetupEnabled(not isSetupEnabled[1]);
 		e.blocked = true;
@@ -214,10 +214,15 @@ ashita.events.register('command', 'command_cb', function (e)
 end);
 
 local function forceUpdateBuffs()
+	if (not isInitialized) then return; end
 	if setupModel then setupModel:refreshFilteredBuffs() end
 	model:refreshFilteredBuffs()
 end
 
+local function forceUpdateScales()
+	if (not isInitialized) then return; end
+	view:updatePartyScales();
+end
 function DrawConfigMenu()
 	if(imgui.Begin(("XivParty Config"), true)) then
 
@@ -231,9 +236,11 @@ function DrawConfigMenu()
 		if (imgui.Checkbox('Hide During Cutscene', { Settings.hideCutscene })) then
 			Settings.hideCutscene = not Settings.hideCutscene;
 		end
+		--[[
 		if (imgui.Checkbox('Mouse Targeting', { Settings.mouseTargeting })) then
 			Settings.mouseTargeting = not Settings.mouseTargeting;
 		end
+		]]--
 		if (imgui.Checkbox('Swap Single Alliance', { Settings.swapSingleAlliance })) then
 			Settings.swapSingleAlliance = not Settings.swapSingleAlliance;
 		end
@@ -241,45 +248,143 @@ function DrawConfigMenu()
 			Settings.rangeNumeric = not Settings.rangeNumeric;
 		end
 
+		local rangeString = {tostring(Settings.rangeIndicator)};
+		if imgui.InputText('Range Indicator', rangeString, 999) then
+			Settings.rangeIndicator = tonumber(rangeString[1]);
+		end
+		local rangeFarString = {tostring(Settings.rangeIndicatorFar)};
+		if imgui.InputText('Range Indicator Far', rangeFarString, 999) then
+			Settings.rangeIndicatorFar = tonumber(rangeFarString[1]);
+		end
+		local updateString = {tostring(Settings.updateIntervalMsec)};
+		if imgui.InputText('Update Interval (msec)', updateString, 999) then
+			Settings.updateIntervalMsec = tonumber(updateString[1]);
+		end
+
+		-- Party Settings
+		if (imgui.CollapsingHeader("Party")) then
+			local partyCustomScaling = { Settings.party.scale[1] ~= 0 };
+			if (imgui.Checkbox('Party Custom Scaling', partyCustomScaling)) then
+				if (partyCustomScaling[1]) then
+					Settings.party.scale = T{1,1};
+				else
+					Settings.party.scale = T{0,0};
+				end
+				forceUpdateScales();
+			end
+			if (partyCustomScaling[1]) then
+				local partyScale = { Settings.party.scale[1] };
+				if (imgui.SliderFloat('Party Scale', partyScale, 0.25, 2.5, '%.2f')) then
+					Settings.party.scale[1] = partyScale[1];
+					Settings.party.scale[2] = partyScale[1];
+					forceUpdateScales();
+				end
+			end
+		end
+
+		-- Alliance 1 Settings
+		if (imgui.CollapsingHeader("Alliance 1")) then
+			local alOneCustomScaling = { Settings.alliance1.scale[1] ~= 0 };
+			if (imgui.Checkbox('Al1 Custom Scaling', alOneCustomScaling)) then
+				if (alOneCustomScaling[1]) then
+					Settings.alliance1.scale = T{1,1};
+				else
+					Settings.alliance1.scale = T{0,0};
+				end
+				forceUpdateScales();
+			end
+			if (alOneCustomScaling[1]) then
+				local al1Scale = { Settings.alliance1.scale[1] };
+				if (imgui.SliderFloat('Al1 Scale', al1Scale, 0.25, 2.5, '%.2f')) then
+					Settings.alliance1.scale[1] = al1Scale[1];
+					Settings.alliance1.scale[2] = al1Scale[1];
+					forceUpdateScales();
+				end
+			end
+		end
+
+		-- Alliance 2 Settings
+		if (imgui.CollapsingHeader("Alliance 2")) then
+			local al2CustomScaling = { Settings.alliance2.scale[1] ~= 0 };
+			if (imgui.Checkbox('Al2 Custom Scaling', al2CustomScaling)) then
+				if (al2CustomScaling[1]) then
+					Settings.alliance2.scale = T{1,1};
+				else
+					Settings.alliance2.scale = T{0,0};
+				end
+				forceUpdateScales();
+			end
+			if (al2CustomScaling[1]) then
+				local al2Scale = { Settings.alliance2.scale[1] };
+				if (imgui.SliderFloat('Al2 Scale', al2Scale, 0.25, 2.5, '%.2f')) then
+					Settings.alliance2.scale[1] = al2Scale[1];
+					Settings.alliance2.scale[2] = al2Scale[1];
+					forceUpdateScales();
+				end
+			end
+		end
+
+		--[[
+		party = {
+			scale = T{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
+			itemSpacing = 0, -- distance between party list items
+			alignBottom = false, -- expands the party list from bottom to top
+			showEmptyRows = false -- show empty rows in partially full parties
+		},
+		alliance1 = {
+			scale = T{ 0, 0 },
+			itemSpacing = 0,
+			alignBottom = false,
+			showEmptyRows = false
+		},
+		alliance2 = {
+			scale = T{ 0, 0 },
+			itemSpacing = 0,
+			alignBottom = false,
+			showEmptyRows = false
+		},
+		]]--
 		-- buffs
-		local comboBoxItems = {};
-		comboBoxItems[0] = 'blacklist';
-		comboBoxItems[1] = 'whitelist';
-		if(imgui.BeginCombo('Buff Filter Mode', Settings.buffs.filterMode)) then
-			for i = 0,#comboBoxItems do
-				local is_selected = i == Settings.buffs.filterMode;
+		if (imgui.CollapsingHeader("Buffs")) then
+			local comboBoxItems = {};
+			comboBoxItems[0] = 'blacklist';
+			comboBoxItems[1] = 'whitelist';
+			if(imgui.BeginCombo('Buff Filter Mode', Settings.buffs.filterMode)) then
+				for i = 0,#comboBoxItems do
+					local is_selected = i == Settings.buffs.filterMode;
 
-				if (imgui.Selectable(comboBoxItems[i], is_selected) and Settings.buffs.filterMode~= i) then
-					Settings.buffs.filterMode = comboBoxItems[i];
-					forceUpdateBuffs();
+					if (imgui.Selectable(comboBoxItems[i], is_selected) and Settings.buffs.filterMode~= i) then
+						Settings.buffs.filterMode = comboBoxItems[i];
+						forceUpdateBuffs();
+					end
+					if(is_selected) then
+						imgui.SetItemDefaultFocus();
+					end
 				end
-				if(is_selected) then
-					imgui.SetItemDefaultFocus();
+				imgui.EndCombo();
+			end
+
+			local filterString = {''};
+			for _,v in pairs(Settings.buffs.filters) do
+				filterString[1] = filterString[1]..v..',';
+			end
+			if imgui.InputText('Buff Filters', filterString, 999) then
+				local newFilter = T{};
+				for w in filterString[1]:gmatch("([^,]+)") do 
+					table.insert(newFilter,tonumber(w));
+				end
+				if (not table.equals(newFilter, Settings.buffs.filters)) then
+					Settings.buffs.filters = newFilter;
+					forceUpdateBuffs()
 				end
 			end
-			imgui.EndCombo();
-		end
-
-		local inputString = {''};
-		for _,v in pairs(Settings.buffs.filters) do
-			inputString[1] = inputString[1]..v..',';
-		end
-		if imgui.InputText('Buff Filters', inputString, 999) then
-			local newFilter = T{};
-			for w in inputString[1]:gmatch("([^,]+)") do 
-				table.insert(newFilter,tonumber(w));
-			end
-			if (not table.equals(newFilter, Settings.buffs.filters)) then
-				Settings.buffs.filters = newFilter;
+			if (imgui.Checkbox('Buff Custom Order', { Settings.buffs.customOrder })) then
+				Settings.buffs.customOrder = not Settings.buffs.customOrder;
 				forceUpdateBuffs()
 			end
-		 end
-		if (imgui.Checkbox('Buff Custom Order', { Settings.buffs.customOrder })) then
-			Settings.buffs.customOrder = not Settings.buffs.customOrder;
-			forceUpdateBuffs()
 		end
+		imgui.End();
 	end
-	imgui.End();
 
 	view:drawDragConfig();
 end
@@ -304,6 +409,7 @@ ashita.events.register('d3d_present', 'present_cb', function ()
 	view:visible(isSetupEnabled[1] or not Settings.hideSolo or not isSolo(), const.visSolo)
 	view:update()
 end)
+
 -- packets
 --[[
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
