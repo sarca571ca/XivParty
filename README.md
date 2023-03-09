@@ -4,7 +4,7 @@ A party list addon originally for Windower4 that I updated and ported to Ashita 
 Original Windower4 addon by Tylas11 [https://github.com/Tylas11/XivParty]
 
 ## Show Your Support ##
-If you would like to show your support for my addon creation and porting consider buying me a coffee! 
+If you would like to show your support for my addon creation and porting consider buying me (Tirem) a coffee! 
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A6JC40H)
 
