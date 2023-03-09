@@ -208,7 +208,9 @@ local function CheckState()
 		dispose();
 	end
 
-	view:visible(not Settings.hideCutscene or not gStatusLib.helpers.GetGameInterfaceHidden(), const.visCutscene) -- hide UI during cutscenes
+	if (isInitialized) then
+		view:visible(not Settings.hideCutscene or not gStatusLib.helpers.GetGameInterfaceHidden(), const.visCutscene) -- hide UI during cutscenes
+	end
 end
 
 ashita.events.register('command', 'command_cb', function (e)
