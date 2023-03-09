@@ -42,7 +42,7 @@ local function load_image_from_path(path)
 
 	local returnImage = nil;
 	-- use black as colour-key for transparency
-	if (ffi.C.D3DXCreateTextureFromFileExA(d3d8_device, path, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0, ffi.C.D3DFMT_A8R8G8B8, ffi.C.D3DPOOL_MANAGED, ffi.C.D3DX_DEFAULT, ffi.C.D3DX_DEFAULT, 0xFF000000, imageInfo, nil, dx_texture_ptr) == ffi.C.S_OK) then
+	if (ffi.C.D3DXCreateTextureFromFileExA(d3d8_device, path, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0, ffi.C.D3DFMT_A8R8G8B8, ffi.C.D3DPOOL_MANAGED, ffi.C.D3DX_DEFAULT, ffi.C.D3DX_DEFAULT, 0x00000000, imageInfo, nil, dx_texture_ptr) == ffi.C.S_OK) then
 		returnImage = d3d8.gc_safe_release(ffi.cast('IDirect3DTexture8*', dx_texture_ptr[0]));
 	end
 
