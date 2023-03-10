@@ -378,7 +378,7 @@ local layout = {
 			-- buff icons
 			buffIcons = element({
 				pos = T{ 293, 0 },
-				path = 'assets/buffIcons/', -- directory where buff icons can be found. must follow naming pattern: <buffId>.png
+				path = 'libs/status/icons/XIView/', -- directory where buff icons can be found. must follow naming pattern: <buffId>.png
 				size = T{ 20, 20 }, -- size of all buff icon images
 				color = '#FFFFFFFF', -- color of all buff icon images
 				spacing = T{ 0, 1 }, -- spacing between each icon

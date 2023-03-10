@@ -36,6 +36,7 @@ local const = {
     layoutDir = 'layouts/',
     layoutAllianceSuffix = '_alliance',
 	defaultLayout = 'ffxi',
+	defaultIconOverride = '-Layout-';
 
 	maxBuffs = 32,
 	baseResY = 1440, -- default positions and scales are based on a 1440p screen

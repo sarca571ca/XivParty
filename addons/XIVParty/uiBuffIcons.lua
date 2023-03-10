@@ -188,7 +188,13 @@ function uiBuffIcons:update()
 			end
 
 			if buff then
-				image:path(self.layout.path .. tostring(buff) .. '.png')
+				local basePath;
+				if (Settings.buffIconOverride ~= const.defaultIconOverride) then
+					basePath = 'libs/status/icons/' .. Settings.buffIconOverride .. '/';
+				else
+					basePath =  self.layout.path;
+				end
+				image:path(basePath .. tostring(buff) .. '.png')
 				image:show(const.visFeature)
 			else
 				image:path('')

@@ -31,7 +31,7 @@ addon.author = 'Tirem, Tylas (Original Creator)'
 addon.version = '2.1.1'
 
 -- windower library imports
-gStatusLib = require('status.status');
+gStatusLib = require('libs/status/status');
 require('common')
 local socket = require('socket')
 local imgui = require('imgui')
@@ -42,6 +42,7 @@ local utils = require('utils')
 local uiView = require('uiView')
 local model = require('model').new()
 settingsLib = require('settings')
+local images = require('libs/sprites');
 
 -- local and global variables
 local isInitialized = false
@@ -252,7 +253,7 @@ local function get_layout_paths()
 end 
 
 function DrawConfigMenu()
-	if(imgui.Begin(("XivParty Config"), true)) then
+	if(imgui.Begin(("XivParty Config"), true, ImGuiWindowFlags_AlwaysAutoResize)) then
 
 		-- Use tabs for this config menu
 		imgui.BeginTabBar('XivParty Settings Tabs');
@@ -278,6 +279,34 @@ function DrawConfigMenu()
                 imgui.EndCombo();
             end
             imgui.ShowHelp('active UI layout, found in XivParty/layouts directory'); 
+
+            -- Status Icon Theme
+            local status_theme_paths = gStatusLib.GetIconThemePaths();
+			if (status_theme_paths == nil) then
+				status_theme_paths = T{'-Layout-'};
+			else
+				table.insert(status_theme_paths, '-Layout-');
+			end
+			if (status_theme_paths ~= nil) then
+				if (imgui.BeginCombo('Buff Icons', Settings.buffIconOverride)) then
+					for i = 1,#status_theme_paths,1 do
+						local is_selected = i == Settings.buffIconOverride;
+
+						if (imgui.Selectable(status_theme_paths[i], is_selected) and status_theme_paths[i] ~= Settings.buffIconOverride) then
+							Settings.buffIconOverride = status_theme_paths[i];
+							gStatusLib.ClearIconCache();
+							images.ClearCache();
+							view:reload()
+						end
+
+						if (is_selected) then
+							imgui.SetItemDefaultFocus();
+						end
+					end
+					imgui.EndCombo();
+				end
+				imgui.ShowHelp('Override the path listed in the -Layout- for buff icons to [addons\\XivParty\\libs\\status\\icons]');
+			end
 
 			if (imgui.Checkbox('Hide Solo', { Settings.hideSolo })) then
 				Settings.hideSolo = not Settings.hideSolo;

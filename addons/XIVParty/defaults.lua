@@ -32,6 +32,8 @@ local const = require('const')
 local defaults = {
 	layout = const.defaultLayout, -- active UI layout, found in XivParty/layouts directory
 
+	buffIconOverride = const.defaultIconOverride;
+
 	hideKeyCode = 207, -- DirectInput keyboard (DIK) code for holding down button to temporarily hide UI. set 0 to disable. default: "End" key
 	hideSolo = false, -- hides the party list when you are not in a party
 	hideAlliance = false, -- hides UI for alliance parties

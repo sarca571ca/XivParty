@@ -114,6 +114,11 @@ function sprites:destroy()
 	renderInfo[self.renderKey] = nil;
 end
 
+-- Clear our cache so all images get reloaded
+sprites.ClearCache = function()
+	imageCache = T{};
+end
+
 -- Render everything that is in our renderinfo
 ashita.events.register('d3d_present', '__sprites_present_cb', function ()
 	if (sprite ~= nil) then
