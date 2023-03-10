@@ -1,0 +1,3 @@
+[submodule "XIVParty/libs/status"]
+	path = XIVParty/libs/status
+	url = https://github.com/tirem/statuslib
