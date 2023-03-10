@@ -15,9 +15,12 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 ![Screenshot](https://i.imgur.com/ZVwmwCW.jpg) ![Screenshot2](https://i.imgur.com/58j2zMk.jpg)
 
 ## Installation
+* Download the latest release from the panel on the right. Please download the top option on the release page.
+* Extract the folder and drop the addons folder within into the install location of Ashita v4
 * Load using "/addon load xivparty" in the chat window
 * To load the addon automatically when the game starts, edit scripts/default.txt and add "/addon load xivparty" at the end
 * RECOMMENDED: Download and install the free font "[Grammara](https://www.fontspace.com/grammara-font-f4454)" for a more authentic FF14 look of the numbers (restart Ashita afterwards, or it won't find the newly installed font)
+* NOTE: You will not be able to load this addon if you download it from the CODE button above, as it relies on git submodules to function. Please always download from the release page on the right!
 
 ## Commands
 Commands were replaced with a simple config menu made in imgui. Simply type "/xivparty" or "/xp" to open the new config menu and access all the options!
