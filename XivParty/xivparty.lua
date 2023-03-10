@@ -26,8 +26,8 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-addon.name = 'XIVParty'
-addon.author = 'Tirem, Tylas (Original Creator)'
+addon.name = 'XivParty'
+addon.author = 'Tirem (Porting and Updates), Tylas (Original Creator)'
 addon.version = '2.1.1'
 
 -- windower library imports
