@@ -63,6 +63,7 @@ jobs.roles = {
 	['GEO'] = support,
 	['RUN'] = tank,
 	['SPC'] = special,
+	['NON'] = special,
 	['MON'] = dd
 }
 

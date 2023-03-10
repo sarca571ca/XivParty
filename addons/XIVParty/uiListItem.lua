@@ -158,14 +158,14 @@ function uiListItem:updateJob()
 	local subJobString = ''
 
 	if not self.player.isOutsideZone then
-		if self.player.job then
+		if self.player.job and self.player.job ~= 'NON' then
 			jobString = self.player.job
 			if self.player.jobLvl then
 				jobString = jobString .. ' ' .. tostring(self.player.jobLvl)
 			end
 		end
 
-		if self.player.subJob and self.player.subJob ~= 'MON' then
+		if self.player.subJob and not T{'MON','NON'}:contains(self.player.subJob) then
 			subJobString = self.player.subJob
 			if self.player.subJobLvl then
 				subJobString = subJobString .. ' ' .. tostring(self.player.subJobLvl)
