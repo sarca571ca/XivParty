@@ -1,0 +1,3 @@
+[submodule "XivParty/libs/status"]
+	path = XivParty/libs/status
+	url = https://github.com/tirem/statuslib
