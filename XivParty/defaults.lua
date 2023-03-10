@@ -29,7 +29,7 @@
 -- imports
 local const = require('const')
 
-local defaults = {
+local defaults = T{
 	layout = const.defaultLayout, -- active UI layout, found in XivParty/layouts directory
 
 	buffIconOverride = const.defaultIconOverride;
@@ -70,7 +70,7 @@ local defaults = {
 	},
 
 	buffs = {
-		filters = {}, -- table of buffs to filter
+		filters = T{}, -- table of buffs to filter
 		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
 		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
 	}
