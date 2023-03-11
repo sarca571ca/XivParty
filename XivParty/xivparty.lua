@@ -28,7 +28,7 @@
 
 addon.name = 'XivParty'
 addon.author = 'Tirem (Porting and Updates), Tylas (Original Creator)'
-addon.version = '2.1.1'
+addon.version = '1.0.1'
 
 -- windower library imports
 gStatusLib = require('libs/status/status');
