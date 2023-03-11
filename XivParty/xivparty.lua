@@ -53,6 +53,7 @@ local view = nil
 
 local setupModel = nil
 local isSetupEnabled = { false };
+local announcedLogin = false;
 
 math.randomseed(os.time())
 
@@ -86,9 +87,12 @@ end
 
 local function init()
 	if not isInitialized then
-		print(chat.header(addon.name)..'-Initializing- Type /xp or /xivparty to open config')
 		view = uiView.new(model) -- depends on settings, always create view after loading settings
 		isInitialized = true
+		if (announcedLogin == false) then
+			print(chat.header(addon.name)..'-Initializing- Type /xp or /xivparty to open config');
+			announcedLogin = true;
+		end
 	end
 end
 
