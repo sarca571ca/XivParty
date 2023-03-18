@@ -151,11 +151,15 @@ function uiPartyList:drawDragConfig()
 		imgui.SetNextWindowPos({self.posX, self.posY});
 		self.isUiLocked = true;
 	end
+	imgui.PushStyleColor(ImGuiCol_WindowBg, {1,1,0,1});
+	imgui.PushStyleVar(ImGuiStyleVar_WindowBorderSize, 3);
 	imgui.Begin(("XivParty: Move Party %s"):fmt(self.partyIndex), true, bit.bor(ImGuiWindowFlags_NoSavedSettings, ImGuiWindowFlags_NoDecoration))
 	local posX, posY = imgui.GetWindowPos();
 	self:pos(posX, posY)
 	setUiPosition(posX, posY, self.partyIndex)
 	imgui.End();
+	imgui.PopStyleColor(1);
+	imgui.PopStyleVar(1);
 end
 
 

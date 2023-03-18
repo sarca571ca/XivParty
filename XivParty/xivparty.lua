@@ -88,7 +88,7 @@ local function setSetupEnabled(enabled)
 	else
 		print(chat.header(addon.name)..'Config opened (/xp or /xivparty)')
 		print(chat.header(addon.name)..'Retype the command to save and close')
-		print(chat.header(addon.name)..'To move party lists click and drag the grey boxes')
+		print(chat.header(addon.name)..'To move party lists click and drag the yellow boxes')
 	end
 end
 
