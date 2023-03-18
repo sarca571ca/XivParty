@@ -26,7 +26,6 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
--- windower library imports
 local texts = require('libs/gdifonts/include');
 -- imports
 local classes = require('classes')

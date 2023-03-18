@@ -26,12 +26,19 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- DEV: DEBUG ONLY
+local bUseDebugStatusLib = false;
+
 addon.name = 'XivParty'
 addon.author = 'Tirem (Porting and Updates), Tylas (Original Creator)'
 addon.version = '1.0.1'
 
 -- windower library imports
-gStatusLib = require('libs/status/status');
+if (bUseDebugStatusLib) then
+	gStatusLib = require('libs/statuslib/status');
+else
+	gStatusLib = require('libs/status/status');
+end
 require('common')
 local socket = require('socket')
 local imgui = require('imgui')
