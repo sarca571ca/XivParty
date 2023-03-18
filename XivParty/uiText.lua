@@ -27,8 +27,7 @@
 ]]
 
 -- windower library imports
-local texts = require('libs/gdifonts/gdifonts')
-texts:create_interface();
+local texts = require('libs/gdifonts/include');
 -- imports
 local classes = require('classes')
 local uiElement = require('uiElement')
@@ -78,7 +77,7 @@ function uiText:init(layout)
 			end
 		end
 
-        private[self].font = layout.font
+        private[self].font = texts:get_font_available(layout.font) and layout.font or 'Arial';
         private[self].fontSize = layout.size
         private[self].strokeWidth = layout.strokeWidth
     end
@@ -123,7 +122,7 @@ function uiText:createPrimitives()
         box_width = 0,
         font_alignment = private[self].alignRight and texts.Alignment.Right or texts.Alignment.Left;
         font_color = tonumber(string.format('%02x%02x%02x%02x', private[self].color.a, private[self].color.r, private[self].color.g, private[self].color.b), 16),
-        font_family = private[self].font or 'Arial',
+        font_family = private[self].font,
         font_flags = texts.FontFlags.Bold,
         font_height = 12,
         gradient_color = 0x00000000,
