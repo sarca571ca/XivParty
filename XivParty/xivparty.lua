@@ -31,7 +31,7 @@ local bUseDebugStatusLib = false;
 
 addon.name = 'XivParty'
 addon.author = 'Tirem (Porting and Updates), Tylas (Original Creator)'
-addon.version = '1.0.1'
+addon.version = '1.1.1'
 
 -- windower library imports
 if (bUseDebugStatusLib) then
