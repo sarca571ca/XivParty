@@ -91,7 +91,7 @@ function model:GetMemberInformation(memIdx)
         memberInfo.level = party:GetMemberMainJobLevel(memIdx);
 		memberInfo.subLevel = party:GetMemberSubJobLevel(memIdx);
         memberInfo.serverid = party:GetMemberServerId(memIdx);
-        local t1, t2 = gStatusLib.helpers.GetTargets();
+        local t1, t2 = statusHelpers.GetTargets();
         memberInfo.targetIdx = party:GetMemberTargetIndex(memIdx);
         memberInfo.targeted = (t1 and t1 == memberInfo.targetIdx);
         memberInfo.subTargeted = (t2 and t2 == memberInfo.targetIdx);
@@ -121,7 +121,7 @@ function model:GetMemberInformation(memIdx)
 end
 
 function model:updatePlayers()
-	local target, subtarget = gStatusLib.helpers.GetTargets();
+	local target, subtarget = statusHelpers.GetTargets();
 
 	for i = 0, 17 do
 		local idx = (i / 6):floor()

@@ -214,14 +214,14 @@ end
 
 local function CheckState()
 	-- Check for login state
-	if (gStatusLib.helpers.bLoggedIn) then
+	if (statusHelpers.bLoggedIn) then
 		init();
 	else
 		dispose();
 	end
 
 	if (isInitialized) then
-		view:visible(not Settings.hideCutscene or not gStatusLib.helpers.GetGameInterfaceHidden(), const.visCutscene) -- hide UI during cutscenes
+		view:visible(not Settings.hideCutscene or not statusHelpers.GetGameInterfaceHidden(), const.visCutscene) -- hide UI during cutscenes
 	end
 end
 
