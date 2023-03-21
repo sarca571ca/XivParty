@@ -133,8 +133,6 @@ function uiImage:createPrimitives()
 
 	self.wrappedImage = images:new();
 	RefCountImage = RefCountImage + 1
-	self.wrappedImage.locked = true;
-	self.wrappedImage.lockedz = true;
 	self.can_focus = false;
 	--self.wrappedImage:fit(false) -- scaling only works when 'fit' is false
 
