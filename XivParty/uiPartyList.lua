@@ -78,7 +78,7 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		if pos.x >= resX then
 			pos.x = resX - layout.columns * layout.columnWidth * scale.x
 
-			print('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' X position to ' .. tostring(pos.x))
+			print('UI out of bounds! Adjusting \'' .. partyIndexToName(self.partyIndex) .. '\' X position to ' .. tostring(pos.x))
 			setUiPosition(pos.x, pos.y, self.partyIndex)
 			saveSettings = true
 		end
@@ -86,7 +86,7 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		if pos.y >= resY then
 			pos.y = resY - layout.rows * layout.rowHeight * scale.y
 
-			print('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' Y position to ' .. tostring(pos.y))
+			print('UI out of bounds! Adjusting \'' .. partyIndexToName(self.partyIndex) .. '\' Y position to ' .. tostring(pos.y))
 			setUiPosition(pos.x, pos.y, self.partyIndex)
 			saveSettings = true
 		end
