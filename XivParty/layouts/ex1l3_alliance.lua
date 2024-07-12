@@ -1,0 +1,411 @@
+local textfont = 'Consolas'
+local assetPath = 'assets/ex1l3/'
+local scale = 1
+local bgWidth = 420*scale
+local barBG = '#FFFFFFFF'
+local hpBarColor = '#c8ff96ff'
+local hpBarGlow = '#e8ffd4FF'
+local mpBarColor = '#c896ffFF'
+local mpBarGlow = '#e8d4ffFF'
+local tpBarColor = '#96c8ffFF'
+local tpBarGlow = '#d3e8ffFF'
+local hpSize = {400*scale,10}
+local hpPos = {0,30}
+local mpSize = {140*scale,10}
+local mpPos = {-131,hpPos[2]+hpSize[2]+2}
+local tpSize = {140*scale,10}
+local tpPos = {-61*scale,hpPos[2]+hpSize[2]+2}
+
+local settings = {
+        partyList = {
+            columnWidth = bgWidth*scale,
+            columns = 1,
+            rowHeight = 42, --46
+            rows = 6,
+            background = {
+                enabled = true,
+                imgBottom = {
+                    color = '#FFFFFFFF',
+                    enabled = true,
+                    path = assetPath .. 'BgBottom.png',
+                    pos = {0,5},
+                    size = {bgWidth,10},
+                },
+                imgMid = {
+                    color = '#FFFFFFFF',
+                    enabled = true,
+                    path = assetPath .. 'BgMid.png',
+                    pos = {0,15},
+                    size = {bgWidth,4},
+                },
+                imgTop = {
+                    color = '#FFFFFFFF',
+                    enabled = true,
+                    path = assetPath .. 'BgTop.png',
+                    pos = {0,7},
+                    size = {bgWidth,8},
+                },
+                pos = {10,-10},
+            },
+            listItem = {
+                enabled = true,
+                hp = {
+                    bar = {
+                        animSpeed = 0.1,
+                        enabled = true,
+                        imgBar = {
+                            color = hpBarColor,
+                            enabled = true,
+                            path = assetPath .. 'Bar.png',
+                            pos = {0,0},
+                            size = hpSize,
+                        },
+                        imgBg = {
+                            color = hpBarColor,
+                            enabled = true,
+                            path = assetPath .. 'Bar.png',
+                            pos = {0,8},
+                            size = {hpSize[1], 2},
+                        },
+                        imgFg = {
+                            color = hpBarColor,
+                            enabled = false,
+                            path = assetPath .. 'BarFg.png',
+                            pos = {0,0},
+                            size = hpSize,
+                        },
+                        imgGlow = {
+                            color = hpBarGlow,
+                            enabled = true,
+                            path = assetPath .. 'BarGlow.png',
+                            pos = {0,0},
+                            size = {6,10},
+                        },
+                        imgGlowSides = {
+                            color = hpBarGlow,
+                            enabled = true,
+                            path = assetPath .. 'BarGlowSides.png',
+                            pos = {0,0},
+                            size = {2,10},
+                        },
+                        pos = hpPos,
+                    },
+                    enabled = true,
+                    hpOrangeColor = '#F8BA80FF',
+                    hpRedColor = '#FC8182FF',
+                    hpYellowColor = '#F3F37CFF',
+                    pos = {19,-7},
+                    snapToRaster = true,
+                    txtValue = {
+                        alignRight = true,
+                        color = '#F0FFFFFF',
+                        enabled = true,
+                        font = textFont,
+                        pos = {398, 15},
+                        size = 18,
+                        snapToRaster = true,
+                        stroke = '#062D54C8',
+                        strokeWidth = 2,
+                    },
+                    zOrder = 1,
+                },
+                mp = {
+                    bar = {
+                        animSpeed = 0.1,
+                        enabled = true,
+                        imgBar = {
+                            color = mpBarColor,
+                            enabled = true,
+                            path = assetPath .. 'Bar.png',
+                            pos = {0,0},
+                            size = mpSize,
+                        },
+                        imgBg = {
+                            color = mpBarColor,
+                            enabled = true,
+                            path = assetPath .. 'Bar.png',
+                            pos = {0,8},
+                            size = {mpSize[1],2}
+                        },
+                        imgFg = {
+                            color = mpBarColor,
+                            enabled = false,
+                            path = assetPath .. 'BarFg.png',
+                            pos = {0,0},
+                            size = {128,64},
+                        },
+                        imgGlow = {
+                            color = mpBarGlow,
+                            enabled = true,
+                            path = assetPath .. 'BarGlow.png',
+                            pos = {0,0},
+                            size = {6,10},
+                        },
+                        imgGlowSides = {
+                            color = mpBarGlow,
+                            enabled = true,
+                            path = assetPath .. 'BarGlowSides.png',
+                            pos = {11,0},
+                            size = {2,10},
+                        },
+                        pos = mpPos,
+                    },
+                    enabled = true,
+                    pos = {150,-7},
+                    snapToRaster = true,
+                    txtValue = {
+                        alignRight = true,
+                        color = '#F0FFFFFF',
+                        enabled = true,
+                        font = textFont,
+                        pos = {65,40},
+                        size = 12,
+                        snapToRaster = true,
+                        stroke = '#000000C8',
+                        strokeWidth = 2,
+                    },
+                    zOrder = 2,
+                },
+                tp = {
+                    bar = {
+                        animSpeed = 0.1,
+                        enabled = true,
+                        imgBar = {
+                            color = tpBarColor,
+                            enabled = true,
+                            path = assetPath .. 'Bar.png',
+                            pos = {0,0},
+                            size = tpSize,
+                        },
+                        imgBg = {
+                            color = tpBarColor,
+                            enabled = true,
+                            path = assetPath .. 'Bar.png',
+                            pos = {0,8},
+                            size = {tpSize[1], 2},
+                        },
+                        imgFg = {
+                            color = tpBarColor,
+                            enabled = false,
+                            path = assetPath .. 'BarFg.png',
+                            pos = {0,0},
+                            size = {128,64},
+                        },
+                        imgGlow = {
+                            color = tpBarGlow,
+                            enabled = true,
+                            path = assetPath .. 'BarGlow.png',
+                            pos = {0,0},
+                            size = {6,10},
+                        },
+                        imgGlowSides = {
+                            color = tpBarGlow,
+                            enabled = true,
+                            path = assetPath .. 'BarGlowSides.png',
+                            pos = {0,0},
+                            size = {2,10},
+                        },
+                        pos = tpPos,
+                    },
+                    enabled = true,
+                    pos = {281,-7},
+                    snapToRaster = true,
+                    txtValue = {
+                        alignRight = true,
+                        color = '#F0FFFFFF',
+                        enabled = true,
+                        font = textFont,
+                        pos = {135,40},
+                        size = 12,
+                        snapToRaster = true,
+                        stroke = '#000000C8',
+                        strokeWidth = 2,
+                    },
+                    tpFullColor = '#50B4FAFF',
+                    zOrder = 3,
+                },
+                jobIcon = {
+                    colors = {
+                        dd = '#663535FF',
+                        healer = '#3B6529FF',
+                        special = '#FF9700FF',
+                        support = '#DAB200FF',
+                        tank = '#364597FF',
+                    },
+                    enabled = true,
+                    imgBg = {
+                        color = '#FFFFFFFF',
+                        enabled = false,
+                        path = 'assets/jobIcons/bg.png',
+                        pos = {0,0},
+                        size = {36,36},
+                    },
+                    imgFrame = {
+                        color = '#FFFFFFFF',
+                        enabled = false,
+                        path = 'assets/jobIcons/frame.png',
+                        pos = {0,0},
+                        size = {36,36},
+                    },
+                    imgGradient = {
+                        color = '#FFFFFFFF',
+                        enabled = false,
+                        path = 'assets/jobIcons/gradient.png',
+                        pos = {0,0},
+                        size = {36,36},
+                    },
+                    imgHighlight = {
+                        color = '#FFFFFFFF',
+                        enabled = false,
+                        path = 'assets/jobIcons/highlight.png',
+                        pos = {-13,-13},
+                        size = {62,62},
+                    },
+                    imgIcon = {
+                        color = '#FFFFFFFF',
+                        enabled = true,
+                        pos = {0,0},
+                        size = {32,32},
+                    },
+                    path = 'assets/jobIcons/',
+                    pos = {15,5},
+                    scale = {1,1},
+                    snapToRaster = true,
+                    zOrder = 4,
+                },
+                leader = {
+                    enabled = false,
+                    imgAlliance = {
+                        color = '#FFFFFFFF',
+                        enabled = true,
+                        path = assetPath .. 'Leader.png',
+                        pos = {0,5},
+                        size = {7,5},
+                    },
+                    imgParty = {
+                        color = '#E6E159FF',
+                        enabled = true,
+                        path = assetPath .. 'Leader.png',
+                        pos = {0,10},
+                        size = {7,5},
+                    },
+                    imgQuarterMaster = {
+                        color = '#66E659FF',
+                        enabled = true,
+                        path = assetPath .. 'Leader.png',
+                        pos = {0,0},
+                        size = {7,5},
+                    },
+                    pos = {88,5},
+                    scale = {1,1},
+                    zOrder = 10,
+                },
+                range = {
+                    enabled = false,
+                    imgFar = {
+                        color = '#FFFFFFFF',
+                        enabled = true,
+                        path = assetPath .. 'RangeFar.png',
+                        pos = {0,0},
+                        size = {10,10},
+                    },
+                    imgNear = {
+                        color = '#FFFFFFFF',
+                        enabled = true,
+                        path = assetPath .. 'Range.png',
+                        pos = {0,0},
+                        size = {10,10},
+                    },
+                    txtDistance = {
+                        color = '#F0FFFFFF',
+                        enabled = true,
+                        font = textFont,
+                        pos = {0,0},
+                        size = 6,
+                        snapToRaster = true,
+                        stroke = '#062D54C8',
+                        strokeWidth = 1,
+                    },
+                    pos = {30,30},
+                    zOrder = 11,
+                },
+                hover = {
+                    color = '#9C94E8AA',
+                    enabled = true,
+                    path = assetPath .. 'Hover.png',
+                    pos = {20,-8},
+                    size = {390,60},
+                    zOrder = 0,
+                },
+                cursor = {
+                    color = '#FFFFFFFF',
+                    enabled = true,
+                    path = assetPath .. 'BlueArrow.png',
+                    pos = {0,4},
+                    size = {10,20},
+                    zOrder = 5,
+                },
+                buffIcons = {
+                    alignRight = false,
+                    color = '#FFFFFFFF',
+                    enabled = false,
+                    numIconsByRow = {20,0},
+                    offsetByRow = {0,10},
+                    path = 'libs/status/icons/RadialArcana/',
+                    pos = {20,55},
+                    size = {18,18},
+                    spacing = {0,1},
+                    zOrder = 12,
+                },
+                txtName = {
+                    color = '#F0FFFFFF',
+                    enabled = true,
+                    font = textFont, -- arial
+                    pos = {50,5}, -- 95.1
+                    size = 18,
+                    snapToRaster = true,
+                    stroke = '#062D54C8',
+                    strokeWidth = 2,
+                    maxChars = 17,
+                    zOrder = 6,
+                },
+                txtZone = {
+                    alignRight = false,
+                    color = '#F0FFFFFF',
+                    enabled = true,
+                    font = textFont,
+                    pos = {150,15}, -- 292.1
+                    short = false,
+                    size = 12,
+                    snapToRaster = true,
+                    stroke = '#062D54C8',
+                    strokeWidth = 2,
+                    zOrder = 7,
+                },
+                txtJob = {
+                    color = '#F0FFFFFF',
+                    enabled = false,
+                    font = textFont,
+                    pos = {55,0}, -- 30
+                    size = 8,
+                    snapToRaster = true,
+                    stroke = '#062D54C8',
+                    strokeWidth = 1,
+                    zOrder = 8,
+                },
+                txtSubJob = {
+                    color = '#F0FFFFFF',
+                    enabled = false,
+                    font = textFont,
+                    pos = {60,9}, -- 39
+                    size = 8,
+                    snapToRaster = true,
+                    stroke = '#062D54C8',
+                    strokeWidth = 1,
+                    zOrder = 9,
+                },
+            },
+        },
+}
+
+return settings;
